@@ -28,9 +28,9 @@ const Navbar = () => {
     <div className='bg-slate-200'>
       <div className='flex items-center justify-between px-4 py-2'>
         {/* Logo */}
-        <div className='flex items-center space-x-1'>
+        <div className='flex items-center'>
           <span className='text-slate-500 text-2xl font-semibold'>Naro</span>
-          <span className='text-2xl text-slate-400'>Estate</span>
+          <span className='text-2xl text-slate-400 font-semibold'>Estate</span>
         </div>
 
         {/* Search Bar (Desktop) */}
@@ -44,7 +44,7 @@ const Navbar = () => {
               />
               <Button
                 type="submit"
-                className='absolute right-0 top-0 bottom-0 px-4 py-2 bg-white hover:bg-slate-50 rounded-r-lg border-l border-slate-200 focus:ring-2 focus:ring-slate-500'
+                className='absolute right-0 top-0 bottom-0 px-4 py-2 bg-white hover:bg-slate-50 rounded-r-lg '
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
