@@ -61,7 +61,7 @@ const Navbar = () => {
         </div>
 
         {/* Navbar Links & Avatar */}
-        <div className='flex items-center justify-center space-x-6 hidden sm:flex'>
+        <div className='flex items-center justify-center space-x-6  sm:flex'>
           <Link href={'/'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Home</Link>
           <Link href={'/about'} className='text-slate-600 hover:text-slate-900 transition duration-200'>About</Link>
 
