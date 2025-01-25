@@ -1,6 +1,6 @@
 // mailer.js
 const nodemailer = require('nodemailer');
-const { EMAIL_TYPES, TEMPLATES } = require('./constants'); // Import constants and templates
+import { EMAIL_TYPES, TEMPLATES } from '../constants';
 
 var transport = nodemailer.createTransport({
   host: process.env.MAILTRAP_HOST,
@@ -26,7 +26,7 @@ const sendMail = async (to, subject, emailType, dynamicData = {}) => {
 
     switch (emailType) {
       case EMAIL_TYPES.WELCOME_USER:
-        emailContent = TEMPLATES.WELCOME_USER(dynamicData.username);
+        emailContent = TEMPLATES.WELCOME_USER(dynamicData.username,dynamicData.verificationLink);
         break;
       case EMAIL_TYPES.PASSWORD_RESET:
         emailContent = TEMPLATES.PASSWORD_RESET(dynamicData.resetLink);
@@ -54,7 +54,7 @@ const sendMail = async (to, subject, emailType, dynamicData = {}) => {
   }
 };
 
-module.exports = sendMail;
+export default sendMail;
 
 // Example for function call of sendEmail() function
 
