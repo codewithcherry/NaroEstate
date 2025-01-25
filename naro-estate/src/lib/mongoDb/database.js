@@ -1,24 +1,22 @@
-// MongoDB connection and config file
+const MONGO_URI=process.env.MONGO_URI;
 import mongoose from "mongoose";
 
-const MONGO_URI = process.env.MONGO_URI;
+let isConnected = false;
 
 const connect = async () => {
-  try {
-    // Attempt to connect to MongoDB
-    const connection = await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+  if (isConnected) {
+    console.log("MongoDB is already connected");
+    return;
+  }
 
-    // Connection successful
+  try {
+    const connection = await mongoose.connect(MONGO_URI);
+
+    isConnected = connection.connection.readyState === 1;
     console.log(`MongoDB connected: ${connection.connection.host}`);
   } catch (error) {
-    // Log the error message
     console.error(`Error connecting to MongoDB: ${error.message}`);
-    
-    // Exit the process with a failure code if connection fails
-    process.exit(1);
+    throw error; // Let the caller handle the error
   }
 };
 
