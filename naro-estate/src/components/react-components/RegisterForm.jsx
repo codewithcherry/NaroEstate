@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const RegisterForm = ({ className, ...props }) => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,8 @@ const RegisterForm = ({ className, ...props }) => {
   const [loading, setLoading] = useState(false);
   
   const { toast } = useToast();
+
+  const router= useRouter()
 
   const handleOnChange = (e) => {
     const { id, value } = e.target;
@@ -34,10 +37,14 @@ const RegisterForm = ({ className, ...props }) => {
       });
       toast({ title: response.data.type,
               description: response.data.message || 'Account created successfully!' });
+              setFormData({
+                email: '',
+                password: '',
+              })
+              router.push('/login')
     } catch (error) {
       console.log(error);
-      toast({ title: error.response.data.type,
-        description: error.response.data.message || 'Account created successfully!' });
+      toast({ title: error.response.data.type,description: error.response.data.message || 'something went wrong try again!' });
     } finally {
       setLoading(false);
     }
