@@ -102,7 +102,7 @@ export const POST = async (req) => {
     return NextResponse.json(
       {
         type: "success",
-        message: "User created successfully.",
+        message: "User created successfully. Please verify your account through the link sent in mail.",
         user: { id: savedUser._id, email: savedUser.email }, // Return limited user details
       },
       { status: 201 } // Created
