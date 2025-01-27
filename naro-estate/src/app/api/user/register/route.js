@@ -83,7 +83,7 @@ export const POST = async (req) => {
         EMAIL_TYPES.WELCOME_USER, // Email template type
         {
           username,
-          verificationLink: `${process.env.DOMAIN_URL}/user/verify-email?token=${savedUser.verifyToken}&userId=${savedUser._id}`,
+          verificationLink: `${process.env.DOMAIN_URL}/verify-email?token=${savedUser.verifyToken}&userId=${savedUser._id}`,
         }
       );
     } catch (mailError) {
