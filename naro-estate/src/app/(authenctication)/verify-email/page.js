@@ -1,23 +1,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import Link from 'next/link';
 
 const Page = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const searchParams = useSearchParams(); // Use `useSearchParams` for query parameters
+  const [queryParams, setQueryParams] = useState({ token: null, userId: null });
+
+  useEffect(() => {
+    // Extract query parameters from URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get('token');
+    const userId = searchParams.get('userId');
+    setQueryParams({ token, userId });
+  }, []);
 
   const handleVerify = async () => {
     setIsLoading(true);
     setMessage('');
 
     try {
-      // Extract query parameters
-      const verifyToken = searchParams.get('token');
-      const userId = searchParams.get('userId');
+      const { verifyToken, userId } = queryParams;
 
       if (!verifyToken || !userId) {
         throw new Error('Invalid query parameters. Verification cannot proceed.');
