@@ -20,6 +20,7 @@ const Page = () => {
     setIsClient(true);
   }, []);
 
+  // Function to handle verification when the button is clicked
   const handleVerify = async (searchParams) => {
     setIsLoading(true);
     setMessage('');
@@ -51,6 +52,7 @@ const Page = () => {
     return null; // Or some loading spinner
   }
 
+  // Only render the component after it’s mounted on the client
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
       <Suspense fallback={<Loading />}>
@@ -60,7 +62,10 @@ const Page = () => {
 
           {!message ? (
             <button
-              onClick={() => handleVerify(useSearchParams())}
+              onClick={() => {
+                const searchParams = useSearchParams(); // Inside onClick handler
+                handleVerify(searchParams); // Pass searchParams to handleVerify
+              }}
               className="px-4 py-2 bg-primary text-primary-foreground font-semibold rounded hover:bg-accent hover:text-accent-foreground disabled:bg-muted disabled:text-muted-foreground"
               disabled={isLoading}
             >
