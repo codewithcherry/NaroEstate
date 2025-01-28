@@ -4,6 +4,7 @@ import { useRouter } from 'next/compat/router';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Link from 'next/link';
 
 const VerifyEmail = () => {
   const [loading, setLoading] = useState(false);
@@ -69,18 +70,20 @@ const VerifyEmail = () => {
           </p>
         )}
 
-        <div className="text-center">
-          {!loading ? (
-            <button
-              className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary-dark focus:outline-none"
-              onClick={handleVerify}
-            >
-              Verify
-            </button>
-          ) : (
-            <span className="text-gray-600">Verifying...</span>
-          )}
-        </div>
+        {
+            message?<div className='flex justify-center'> <Link className='mx-auto bg-primary text-white py-2 px-6 rounded-md hover:bg-primary-dark focus:outline-none' href={'/login'}>Login to your account.</Link></div> :<div className="text-center">
+            {!loading ? (
+              <button
+                className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary-dark focus:outline-none"
+                onClick={handleVerify}
+              >
+                Verify
+              </button>
+            ) : (
+              <span className="text-gray-600">Verifying...</span>
+            )}
+          </div>
+        }
       </div>
     </div>
   );
