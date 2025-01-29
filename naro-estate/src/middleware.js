@@ -27,7 +27,7 @@ export const middleware = async (request) => {
   // ✅ Redirect logged-in users away from login/register
   if (isPublicRoute && token) {
     console.log("User already authenticated. Redirecting to /account.");
-    return NextResponse.redirect(new URL("/account", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // ✅ Require authentication for private routes
