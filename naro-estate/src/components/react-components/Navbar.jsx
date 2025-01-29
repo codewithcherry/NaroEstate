@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import * as Avatar from '@radix-ui/react-avatar'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 
 const Navbar = () => {
   // State for toggling the mobile menu
@@ -10,6 +11,8 @@ const Navbar = () => {
 
   // State to track if the component is rendered on the client side
   const [isClient, setIsClient] = useState(false)
+
+  const {isLoggedIn}=useAuth();
 
   useEffect(() => {
     // Set state to true once the component has mounted on the client side
@@ -65,11 +68,7 @@ const Navbar = () => {
           <Link href={'/'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Home</Link>
           <Link href={'/about'} className='text-slate-600 hover:text-slate-900 transition duration-200'>About</Link>
 
-          {/* SignIn Button */}
-          <Link href={'/login'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Signin</Link>
-
-          {/* User Avatar */}
-          <div>
+            {isLoggedIn?<div>
             <Avatar.Root className="relative inline-block w-10 h-10 rounded-full overflow-hidden">
               <Avatar.Image 
                 className="object-cover w-full h-full" 
@@ -80,7 +79,12 @@ const Navbar = () => {
                 UN
               </Avatar.Fallback>
             </Avatar.Root>
-          </div>
+          </div>:<Link href={'/login'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Signin</Link>}
+          {/* SignIn Button */}
+          
+
+          {/* User Avatar */}
+          
         </div>
 
         {/* Mobile Menu Toggle Button */}

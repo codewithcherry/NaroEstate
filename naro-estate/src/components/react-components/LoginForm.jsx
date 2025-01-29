@@ -16,12 +16,15 @@ import Link from "next/link";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginForm = ({ className, ...props }) => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+
+  const {isLoggedIn,setIsLoggedIn}=useAuth();
 
   const handleOnChange = (e) => {
     const { id, value } = e.target;
@@ -43,7 +46,7 @@ const LoginForm = ({ className, ...props }) => {
         title: response.data.type,
         description: response.data.message,
       });
-
+      setIsLoggedIn(true);
       setFormData({ email: "", password: "" });
       router.push("/");
     } catch (error) {
