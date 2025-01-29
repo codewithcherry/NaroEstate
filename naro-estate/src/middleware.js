@@ -8,7 +8,7 @@ if (!SECRET_KEY) throw new Error("JWTOKEN_SECRET is not defined.");
 const SECRET_KEY_BYTES = new TextEncoder().encode(SECRET_KEY);
 
 // Define route patterns
-const publicRoutes = /^\/(login|register|verify-email|signout|listings)?$/;
+const publicRoutes = /^\/(login|register)$/;
 const privateRoutes = /^\/(account|create-listing|update-listing|profile|settings)$/;
 
 export const middleware = async (request) => {
@@ -24,10 +24,15 @@ export const middleware = async (request) => {
     return NextResponse.next();
   }
 
-  // ✅ Redirect logged-in users away from login/register
+  // ✅ If user is authenticated and tries to access login/register, redirect to home page (Prevent Infinite Loop)
   if (isPublicRoute && token) {
-    console.log("User already authenticated. Redirecting to /account.");
-    return NextResponse.redirect(new URL("/", request.url));
+    try {
+      await jwtVerify(token, SECRET_KEY_BYTES); // Verify token
+      console.log("User already authenticated. Redirecting to /.");
+      return NextResponse.redirect(new URL("/", request.url));
+    } catch (err) {
+      console.error("Invalid token detected. Allowing access to login/register.");
+    }
   }
 
   // ✅ Require authentication for private routes
@@ -46,7 +51,6 @@ export const middleware = async (request) => {
       response.headers.set("X-User-ID", payload.id);
       response.headers.set("X-User-Email", payload.email);
       return response;
-
     } catch (err) {
       console.error("Invalid token:", err.message);
       return NextResponse.redirect(new URL("/login", request.url));
