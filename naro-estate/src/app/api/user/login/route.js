@@ -17,8 +17,7 @@ export const POST = async (request) => {
   try {
     await connectDB();
 
-    const requestBody = await request.json(); // Add `await` here
-    const { email, password } = requestBody;
+    const { email, password } = await request.json();
 
     // Check if user exists
     const user = await User.findOne({ email });
@@ -45,16 +44,22 @@ export const POST = async (request) => {
 
     const token = jwt.sign(payload, process.env.JWTOKEN_SECRET, { expiresIn: "1h" });
 
-    // Set token as a cookie
-    const response = NextResponse.json({ type: "success", message: "Login successful" });
-    response.cookies.set("authToken", token, {
-      httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   path: "/",
-    //   sameSite: "strict",
+    // Create response
+    const response = NextResponse.json({
+      type: "success",
+      message: "Login successful",
     });
 
-    return response;
+    // ✅ Correct way to set the cookie in NextResponse
+    response.cookies.set("authToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "strict",
+      maxAge: 3600, // 1 hour in seconds
+    });
+
+    return response; // ✅ Ensure modified response is returned
   } catch (error) {
     console.error("Error in login route:", error);
     return NextResponse.json(
