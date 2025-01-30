@@ -66,7 +66,9 @@ const Navbar = () => {
         {/* Navbar Links & Avatar */}
         <div className="hidden sm:flex items-center justify-center space-x-6">
           <Link href={'/'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Home</Link>
+          <Link href={'/listings'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Listings</Link>
           <Link href={'/about'} className='text-slate-600 hover:text-slate-900 transition duration-200'>About</Link>
+          <Link href={'/contact-us'} className='text-slate-600 hover:text-slate-900 transition duration-200'>Contact Us</Link>
 
             {isLoggedIn?<div>
             <Avatar.Root className="relative inline-block w-10 h-10 rounded-full overflow-hidden">
