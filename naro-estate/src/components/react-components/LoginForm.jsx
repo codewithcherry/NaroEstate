@@ -48,6 +48,8 @@ const LoginForm = ({ className, ...props }) => {
       });
       setIsLoggedIn(true);
       setFormData({ email: "", password: "" });
+      localStorage.setItem('authToken',response.data.token);
+      localStorage.setItem('user',JSON.stringify(response.data.user));
       router.push("/");
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong.";

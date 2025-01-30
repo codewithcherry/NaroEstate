@@ -48,6 +48,14 @@ export const POST = async (request) => {
     const response = NextResponse.json({
       type: "success",
       message: "Login successful",
+      token:token,
+      user:{
+        username: user.username,
+        id: user._id,
+        email: user.email,
+        imageUrl: user.imageUrl,
+        role:user.role
+      }
     });
 
     // ✅ Correct way to set the cookie in NextResponse
