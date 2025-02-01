@@ -125,7 +125,7 @@ const Navbar = () => {
                   <Settings className="w-4 h-4 mr-2" /> Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signout}>
+                <DropdownMenuItem onClick={handleSignout}>
                   <LogOut className="w-4 h-4 mr-2" onClick={handleSignout}/> Signout
                 </DropdownMenuItem>
               </DropdownMenuContent>
