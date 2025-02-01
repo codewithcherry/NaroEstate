@@ -7,12 +7,16 @@ import { useAuth } from '@/context/AuthContext'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu'
 import { LogOut, User, Settings, House ,Search} from "lucide-react"
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
+import { useToast } from '@/hooks/use-toast'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const { isLoggedIn, signout } = useAuth();
+
+  const {toast}=useToast();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
 
@@ -27,6 +31,32 @@ const Navbar = () => {
       .replace('-', ' ')
       .replace(/^./, str => str.toUpperCase());
   };
+
+  const handleSignout=async(e)=>{
+    e.preventDefault();
+    console.log('handle signout method working')
+    try {
+
+      const response=await axios.post('/api/user/signout',{},{
+        headers:{
+          "Content-Type":"application/json"
+        }
+      })
+      console.log(response.data);
+      toast({
+        title:response.data.type,
+        description:response.data.message,
+      })
+      signout();
+      
+    } catch (error) {
+      console.log("error occurred",error);
+      toast({
+        title:error.response.data?.type,
+        description:error.response.data?.message
+      })
+    }
+  }
 
   return (
     <div className="bg-slate-200">
@@ -96,7 +126,7 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signout}>
-                  <LogOut className="w-4 h-4 mr-2" onClick={()=>signout()}/> Signout
+                  <LogOut className="w-4 h-4 mr-2" onClick={handleSignout}/> Signout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -178,7 +208,7 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col space-y-4 mt-4">
             {isLoggedIn ? (
-              <Button variant="outline" className="text-slate-600 hover:bg-slate-100" onClick={()=>signout()}>
+              <Button variant="outline" className="text-slate-600 hover:bg-slate-100" onClick={handleSignout}>
                 Signout
               </Button>
             ) : (
