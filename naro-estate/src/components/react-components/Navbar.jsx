@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast'
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
+  const [signoutLoading,setSignoutLoading]=useState(false);
   const router = useRouter();
   const { isLoggedIn, signout } = useAuth();
 
@@ -36,7 +37,7 @@ const Navbar = () => {
     e.preventDefault();
     console.log('handle signout method working')
     try {
-
+      setSignoutLoading(true);
       const response=await axios.post('/api/user/signout',{},{
         headers:{
           "Content-Type":"application/json"
@@ -55,6 +56,9 @@ const Navbar = () => {
         title:error.response.data?.type,
         description:error.response.data?.message
       })
+    }
+    finally{
+      setSignoutLoading(false);
     }
   }
 
@@ -126,7 +130,7 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignout}>
-                  <LogOut className="w-4 h-4 mr-2" onClick={handleSignout}/> Signout
+                  <LogOut className="w-4 h-4 mr-2" onClick={handleSignout}/> {signoutLoading?<span className='animate-pulse transition delay-75'>Signing out...</span>: <span>Signout</span>}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -209,7 +213,7 @@ const Navbar = () => {
           <div className="flex flex-col space-y-4 mt-4">
             {isLoggedIn ? (
               <Button variant="outline" className="text-slate-600 hover:bg-slate-100" onClick={handleSignout}>
-                Signout
+                {signoutLoading?<span className='animate-pulse transition delay-75'>Signing out...</span>: <span>Signout</span>}
               </Button>
             ) : (
               <Link href="/login">
