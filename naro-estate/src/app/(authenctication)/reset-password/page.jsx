@@ -12,8 +12,7 @@ const page = () => {
 
   return (
     <div>
-        <Suspense fallback={Loading}>
-
+        <Suspense fallback={<Loading />}>
         <ResetPassword />
         </Suspense>
     </div>
