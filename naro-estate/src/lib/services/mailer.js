@@ -29,7 +29,7 @@ const sendMail = async (to, subject, emailType, dynamicData = {}) => {
         emailContent = TEMPLATES.WELCOME_USER(dynamicData.username,dynamicData.verificationLink);
         break;
       case EMAIL_TYPES.PASSWORD_RESET:
-        emailContent = TEMPLATES.PASSWORD_RESET(dynamicData.resetLink);
+        emailContent = TEMPLATES.PASSWORD_RESET(dynamicData.username,dynamicData.resetLink);
         break;
       case EMAIL_TYPES.FORGOT_PASSWORD:
         emailContent = TEMPLATES.FORGOT_PASSWORD(dynamicData.username);

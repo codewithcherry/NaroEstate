@@ -34,9 +34,10 @@ export const TEMPLATES = {
       </body>
       </html>
   `,
-  PASSWORD_RESET: (resetLink) => `
+  PASSWORD_RESET: (username,resetLink) => `
     <html>
       <body>
+        <h1>Hello ${username} </h1>
         <h1>Password Reset Request</h1>
         <p>If you requested a password reset, click the link below to reset your password:</p>
         <a href="${resetLink}">Reset Password</a>
