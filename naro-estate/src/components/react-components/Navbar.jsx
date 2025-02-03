@@ -122,7 +122,7 @@ const Navbar = () => {
                 <DropdownMenuItem onClick={() => router.push('/profile')}>
                   <User className="w-4 h-4 mr-2" /> Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/listings')}>
+                <DropdownMenuItem onClick={() => router.push('/my-listings')}>
                   <House className="w-4 h-4 mr-2" /> My Listings
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/settings')}>
