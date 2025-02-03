@@ -49,6 +49,7 @@ const Navbar = () => {
         description:response.data.message,
       })
       signout();
+      router.push('/')
       
     } catch (error) {
       console.log("error occurred",error);
