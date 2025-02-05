@@ -1,66 +1,54 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { jwtVerify } from 'jose';
 
-const SECRET_KEY = process.env.JWTOKEN_SECRET;
-if (!SECRET_KEY) throw new Error("JWTOKEN_SECRET is not defined.");
+const jwt_secret = process.env.JWTOKEN_SECRET;
 
-// Convert secret to Uint8Array (required by `jose`)
-const SECRET_KEY_BYTES = new TextEncoder().encode(SECRET_KEY);
+const publicPaths = [
+  '/', '/listings', '/api/user/register', '/api/user/login', '/api/user/forgot-password',
+  '/api/user/reset-password', '/api/user/about', '/contact-us', '/api/user/signout'
+];
+const privatePaths = ['/api/user/profile', '/api/user/settings', '/api/user/my-listings'];
 
-// Define route patterns
-const publicRoutes = /^\/(login|register)$/;
-const privateRoutes = /^\/(account|create-listing|update-listing|profile|settings)$/;
+const isPublicPath = (pathname) => publicPaths.includes(pathname);
+const isPrivatePath = (pathname) => privatePaths.includes(pathname);
+const isStaticPath = (pathname) => pathname.startsWith('/_next/static/');
 
 export const middleware = async (request) => {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("authToken")?.value;
-  const isPublicRoute = publicRoutes.test(pathname);
-  const isPrivateRoute = privateRoutes.test(pathname);
 
-  console.log(`[${new Date().toISOString()}] Path: ${pathname}, Token: ${token ? "Present" : "Missing"}`);
-
-  // ✅ Skip static assets & internal Next.js paths
-  if (pathname.startsWith("/_next/") || pathname.match(/\.(js|css|map|ico|png|jpg|svg)$/)) {
+  // Skip static file paths
+  if (isStaticPath(pathname)) {
     return NextResponse.next();
   }
 
-  // ✅ If user is authenticated and tries to access login/register, redirect to home page (Prevent Infinite Loop)
-  if (isPublicRoute && token) {
-    try {
-      await jwtVerify(token, SECRET_KEY_BYTES); // Verify token
-      console.log("User already authenticated. Redirecting to /.");
-      return NextResponse.redirect(new URL("/", request.url));
-    } catch (err) {
-      console.error("Invalid token detected. Allowing access to login/register.");
-    }
+  console.log("current pathname:", pathname);
+
+  if (isPublicPath(pathname)) {
+    return NextResponse.next();
   }
 
-  // ✅ Require authentication for private routes
-  if (isPrivateRoute) {
+  if (isPrivatePath(pathname)) {
+    const token = request.headers.get('Authorization')?.split(' ')[1];
+
+    console.log('Authorization Token:', token);
+
     if (!token) {
-      console.warn("No token found. Redirecting to /login.");
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.json({ type: 'error', message: 'Unauthorized request! Token expired/does not exist!' }, { status: 401 });
     }
 
     try {
-      const { payload } = await jwtVerify(token, SECRET_KEY_BYTES);
-      console.log("Token verified:", payload);
-
-      // ✅ Attach user info to request headers for API usage
+      // Use `jose` for token verification in the Edge runtime
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(jwt_secret));
+      
       const response = NextResponse.next();
-      response.headers.set("X-User-ID", payload.id);
-      response.headers.set("X-User-Email", payload.email);
+      response.headers.set('userId', payload.id);
+      response.headers.set('user', JSON.stringify(payload)); // Example: Add user info in response header
       return response;
-    } catch (err) {
-      console.error("Invalid token:", err.message);
-      return NextResponse.redirect(new URL("/login", request.url));
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      return NextResponse.json({ type: 'error', message: 'Unauthorized request! Token expired/does not exist!' }, { status: 401 });
     }
   }
 
   return NextResponse.next();
-};
-
-// ✅ Efficient route matcher
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
