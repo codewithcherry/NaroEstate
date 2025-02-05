@@ -8,9 +8,9 @@ const page = () => {
   const [profileData,setProfileData]=useState({});
   const [loading,setLoading]=useState(false);
 
-  const token=localStorage.getItem('authToken');
+ 
 
-  const getProfileData=async () => {
+  const getProfileData=async (token) => {
     try {
 
       setLoading(true);
@@ -33,8 +33,9 @@ const page = () => {
   }
 
   useEffect(()=>{
+    const token=localStorage.getItem('authToken');
     console.log(token)
-    getProfileData();
+    getProfileData(token);
   },[])
 
   return (
