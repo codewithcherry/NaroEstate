@@ -11,7 +11,7 @@ const cities = [
 
 const CityCards = () => {
   return (
-    <div className="container mx-auto py-10 w-full">
+    <div className="container mx-auto py-10 ">
       <h2 className="text-3xl font-bold text-center text-foreground">Find Properties in These Cities</h2>
       <p className="text-center text-muted-foreground mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 

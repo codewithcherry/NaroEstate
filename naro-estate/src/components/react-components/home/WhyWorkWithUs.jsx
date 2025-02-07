@@ -21,7 +21,7 @@ const WhyWorkWithUs = () => {
 
   return (
     <section className="py-12 bg-background text-foreground">
-      <div className="max-w-6xl mx-auto text-center">
+      <div className="max-w-6xl container mx-auto text-center">
         <h2 className="text-3xl font-bold mb-2">Why You Should Work With Us</h2>
         <p className="text-muted-foreground mb-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -30,7 +30,7 @@ const testimonials = [
 
 const TestimonialSection = () => {
   return (
-    <section className="py-12 px-4 lg:px-20">
+    <section className="container mx-auto py-12 px-6 lg:px-20">
       <div className="text-center mb-12">
         <div className="flex flex-col lg:flex-row lg:justify-between items-center mb-6">
           <h2 className="text-3xl font-bold mb-4 lg:mb-0">What our customers are saying about us?</h2>
