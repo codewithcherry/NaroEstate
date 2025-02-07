@@ -2,6 +2,7 @@
 import BannerCarousel from "@/components/react-components/home/BannerCarousel";
 import CategoryCards from "@/components/react-components/home/CategoryCards";
 import CityCards from "@/components/react-components/home/CityCards";
+import TestimonialSection from "@/components/react-components/home/TestimonialSection";
 import TrustedCompanies from "@/components/react-components/home/TrustedCompanies";
 import WhyWorkWithUs from "@/components/react-components/home/WhyWorkWithUs";
 
@@ -14,6 +15,7 @@ export default function Home() {
       <WhyWorkWithUs />
       <CategoryCards />
       <TrustedCompanies />
+      <TestimonialSection />
     </div>
   );
 }

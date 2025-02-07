@@ -11,7 +11,7 @@ const TrustedCompanies = () => {
   ];
 
   return (
-    <section className="py-12 bg-foreground text-background rounded-xl mx-10">
+    <section className="py-12 bg-foreground text-background rounded-xl mx-10 my-8">
       <div className="max-w-6xl mx-auto text-center">
         <p className="mb-8 text-muted-foreground">
           Thousands of the world's leading companies trust us
