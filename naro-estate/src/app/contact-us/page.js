@@ -1,9 +1,12 @@
+import ContactUs from '@/components/react-components/contactus/ContactUs'
+import FAQSection from '@/components/react-components/contactus/FAQSection'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      This contact-us page
+      <ContactUs />
+      <FAQSection />
     </div>
   )
 }
