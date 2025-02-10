@@ -23,50 +23,49 @@ const decodeToken = (token) => {
 const isTokenExpired = (token) => {
   const decoded = decodeToken(token);
   if (!decoded || !decoded.exp) return true;
-
   const currentTime = Math.floor(Date.now() / 1000);
   return decoded.exp < currentTime;
 };
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);  // New loading state
   const { toast } = useToast();
   const router = useRouter();
-  const pathname = usePathname(); // Detect current route
+  const pathname = usePathname();
 
   const signout = useCallback(() => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     setIsLoggedIn(false);
-    // router.push('/login'); // Redirect to login page after signing out
-  }, [router]);
+    setLoading(false);
+  }, []);
 
   const checkAuthStatus = useCallback(() => {
+    setLoading(true); // Start loading
     const token = localStorage.getItem('authToken');
     if (token) {
       if (isTokenExpired(token)) {
-        console.log("token expired")
         toast({
           title: 'Session Expired',
           description: 'Your login session has expired. Please log in again.',
         });
         signout();
       } else {
-        console.log("token valid")
         setIsLoggedIn(true);
       }
     } else {
-        console.log('token not found/invalid');   
-        signout();
+      signout();
     }
+    setLoading(false); // End loading
   }, [signout, toast]);
 
   useEffect(() => {
-    checkAuthStatus(); // Check token on initial render and on every route change
+    checkAuthStatus();
   }, [pathname, checkAuthStatus]);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, signout }}>
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, signout, loading }}>
       {children}
     </AuthContext.Provider>
   );

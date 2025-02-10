@@ -2,47 +2,69 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import ProfileHeader from '@/components/react-components/user/profile/ProfileHeader';
 
-const page = () => {
+const Page = () => {
+  const [profileData, setProfileData] = useState({});
+  const [profileLoading, setProfileLoading] = useState(true); // Loading state for fetching profile data
 
-  const [profileData,setProfileData]=useState({});
-  const [loading,setLoading]=useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
+  const { isLoggedIn, loading } = useAuth(); // Use loading state from AuthContext
 
- 
-
-  const getProfileData=async (token) => {
+  const getProfileData = async (token) => {
     try {
-
-      setLoading(true);
-
-      const response= await axios.get('/api/user/profile',{
-        headers:{
-          'Authorization': `Bearer ${token}`, 
-          'Content-Type':'application/json'
-        }
-      })
-
-      console.log(response.data);
+      const response = await axios.get('/api/user/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
       setProfileData(response.data?.user);
     } catch (error) {
-      console.log(error);
+      console.error('Failed to fetch profile data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch profile data. Please try again.',
+      });
+    } finally {
+      setProfileLoading(false);
     }
-    finally{
-      setLoading(false);
-    }
-  }
+  };
 
-  useEffect(()=>{
-    const token=localStorage.getItem('authToken');
-    console.log(token)
-    getProfileData(token);
-  },[])
+  useEffect(() => {
+    if (loading) return; // Wait for AuthContext to finish checking auth status
+
+    const token = localStorage.getItem('authToken');
+    if (!isLoggedIn) {
+      toast({
+        title: 'Error',
+        description: 'Please login to your account to view the profile.',
+      });
+      router.push('/login');
+    } else if (token) {
+      getProfileData(token); // Fetch profile data if the user is authenticated and token exists
+    } else {
+      setProfileLoading(false); // No token found, stop loading
+    }
+  }, [isLoggedIn, loading, router, toast]);
 
   return (
     <div>
-      This is profile page
-    </div>
-  )
-}
+      <h1>Profile Page</h1>
+      {loading || profileLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div> 
+          <ProfileHeader />
 
-export default page
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Page;
