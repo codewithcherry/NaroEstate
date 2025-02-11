@@ -53,12 +53,12 @@ const Page = () => {
   }, [isLoggedIn, loading, router, toast]);
 
   return (
-    <div>
-      <h1>Profile Page</h1>
+    <div className=''>
+      
       {loading || profileLoading ? (
         <p>Loading...</p>
       ) : (
-        <div> 
+        <div className='my-10'> 
           <ProfileHeader />
 
         </div>
