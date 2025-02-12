@@ -62,18 +62,22 @@ export const POST = async (req) => {
     const verifyToken = crypto.randomBytes(32).toString("hex"); // 64-character token
     const verifyTokenExpiry = new Date(Date.now() + 3600000); // 1 hour expiration
 
+    // Extract the username from email
+    const username = email.split("@")[0];
+
     // Create a new user
     const newUser = new User({
+      username,
       email,
       password: hashedPassword,
       verifyToken,
       verifyTokenExpiry,
+      properties:0,
+      bookings:0,
+      guests:0
     });
 
-    const savedUser = await newUser.save();
-
-    // Extract the username from email
-    const username = savedUser.email.split("@")[0];
+    const savedUser = await newUser.save();   
 
     // Send welcome email with verification link
     try {

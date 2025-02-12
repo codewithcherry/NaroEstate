@@ -24,6 +24,7 @@ const Page = () => {
         },
       });
       setProfileData(response.data?.user);
+      console.log(response.data)
     } catch (error) {
       console.error('Failed to fetch profile data:', error);
       toast({
