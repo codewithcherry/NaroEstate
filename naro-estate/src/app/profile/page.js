@@ -24,7 +24,7 @@ const Page = () => {
         },
       });
       setProfileData(response.data?.user);
-      console.log(response.data)
+      // console.log(response.data.user);
     } catch (error) {
       console.error('Failed to fetch profile data:', error);
       toast({
@@ -60,7 +60,7 @@ const Page = () => {
         <p>Loading...</p>
       ) : (
         <div className='my-10'> 
-          <ProfileHeader />
+          <ProfileHeader user={profileData}/>
 
         </div>
       )}

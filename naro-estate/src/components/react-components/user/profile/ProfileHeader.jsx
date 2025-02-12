@@ -7,21 +7,45 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Edit, Mail, Phone, MapPin, Calendar, BadgeCheck } from "lucide-react";
 
-const ProfileHeader = () => {
+const ProfileHeader = ({user}) => {
+
+  const {
+    firstname,
+    lastname,
+    username,
+    email,
+    phone,
+    isVerified,
+    city,
+    country,
+    createdAt,
+    bio,
+    languages,
+    imageUrl,
+    properties,
+    bookings,
+    guests
+  } = user || {};  // Ensure user is defined to avoid errors
+
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    firstname: "Prashanth",
-    lastname: "Naroju",
-    username: "prashanth_naroju",
-    isVerified: true,
-    useremail: "narojuprashanth1234@gmail.com",
-    phone: "3242454355",
-    city: "Hyderabad",
-    country: "India",
-    joinedDate: "2020-01-15",
-    bio: "Passionate developer and tech enthusiast.",
-    languages: ["English", "Hindi", "Telugu"],
+    firstname: firstname || "",
+    lastname: lastname || "",
+    username: username || "",
+    imageUrl: imageUrl || "",
+    isVerified: isVerified || false,
+    useremail: email || "",
+    phone: phone || "",
+    city: city || "NA",
+    country: country || "NA",
+    joinedDate: createdAt || "",
+    bio: bio || "NA",
+    languages: languages || ["NA"],
+    properties:properties,
+    bookings:bookings,
+    guests:guests
   });
+ 
 
   const [tempProfile, setTempProfile] = useState(profile);
 
@@ -53,13 +77,11 @@ const ProfileHeader = () => {
         <div className="flex flex-col lg:flex-row lg:space-x-10 space-y-8 lg:space-y-0">
           {/* Profile Picture and Basic Info */}
           <div className="lg:w-1/3 text-center">
-            <div className="relative w-40 h-40 mx-auto rounded-full border-2 border-gray-300">
-              <Image
-                src="/images/team4.avif"
+          <div className="relative w-40 h-40 mx-auto rounded-full border-2 border-gray-300">
+              <img
+                src={profile.imageUrl}
                 alt="Profile Picture"
-                fill
-                className="object-cover rounded-full"
-                priority
+                className="object-cover rounded-full w-full h-full"
               />
               <button
                 className="absolute bottom-1 right-1 bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 z-10"
@@ -88,15 +110,15 @@ const ProfileHeader = () => {
           <div className="flex-1 space-y-6 overflow-y-auto">
             <div className="flex justify-between p-4 bg-gray-100 rounded-lg">
               <div className="text-center">
-                <div className="text-2xl font-bold">12</div>
+                <div className="text-2xl font-bold">{profile.properties}</div>
                 <div className="text-gray-600 text-sm">Properties</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">45</div>
+                <div className="text-2xl font-bold">{profile.bookings}</div>
                 <div className="text-gray-600 text-sm">Bookings</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">89</div>
+                <div className="text-2xl font-bold">{profile.guests}</div>
                 <div className="text-gray-600 text-sm">Guests</div>
               </div>
             </div>
