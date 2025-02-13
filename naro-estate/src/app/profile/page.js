@@ -8,12 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 import ProfileHeader from '@/components/react-components/user/profile/ProfileHeader';
 
 const Page = () => {
-  const [profileData, setProfileData] = useState({});
-  const [profileLoading, setProfileLoading] = useState(true); // Loading state for fetching profile data
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const router = useRouter();
   const { toast } = useToast();
-  const { isLoggedIn, loading } = useAuth(); // Use loading state from AuthContext
+  const { isLoggedIn, loading } = useAuth();
 
   const getProfileData = async (token) => {
     try {
@@ -24,7 +24,6 @@ const Page = () => {
         },
       });
       setProfileData(response.data?.user);
-      // console.log(response.data.user);
     } catch (error) {
       console.error('Failed to fetch profile data:', error);
       toast({
@@ -37,7 +36,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if (loading) return; // Wait for AuthContext to finish checking auth status
+    if (loading) return;
 
     const token = localStorage.getItem('authToken');
     if (!isLoggedIn) {
@@ -47,21 +46,19 @@ const Page = () => {
       });
       router.push('/login');
     } else if (token) {
-      getProfileData(token); // Fetch profile data if the user is authenticated and token exists
+      getProfileData(token);
     } else {
-      setProfileLoading(false); // No token found, stop loading
+      setProfileLoading(false);
     }
   }, [isLoggedIn, loading, router, toast]);
 
   return (
     <div className=''>
-      
       {loading || profileLoading ? (
         <p>Loading...</p>
       ) : (
-        <div className='my-10'> 
-          <ProfileHeader user={profileData}/>
-
+        <div className='my-10'>
+          <ProfileHeader user={profileData} />
         </div>
       )}
     </div>
