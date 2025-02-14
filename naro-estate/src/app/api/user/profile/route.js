@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import User from "@/lib/models/user.model";
 
+import connect from "@/lib/mongoDb/database";
+
 export const GET = async (request) => {
     try {
         // Access headers from the request
         const userId = request.headers.get("userId");
-        console.log(userId);
+        // console.log(userId);
+
+        await connect();
 
         // Validate userId
         if (!userId) {

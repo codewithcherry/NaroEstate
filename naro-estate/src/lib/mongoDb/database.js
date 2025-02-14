@@ -1,22 +1,28 @@
-const MONGO_URI=process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI;
 import mongoose from "mongoose";
 
-let isConnected = false;
-
 const connect = async () => {
-  if (isConnected) {
+  if (mongoose.connection.readyState > 0) {
     console.log("MongoDB is already connected");
     return;
   }
 
   try {
-    const connection = await mongoose.connect(MONGO_URI);
+    const connection = await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
+      socketTimeoutMS: 45000,         // Close socket after 45 seconds of inactivity
+    });
 
-    isConnected = connection.connection.readyState === 1;
     console.log(`MongoDB connected: ${connection.connection.host}`);
   } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    throw error; // Let the caller handle the error
+    if (error.name === "MongoNetworkError") {
+      console.error("Network error: Could not connect to MongoDB. Please check your network.");
+    } else {
+      console.error(`Error connecting to MongoDB: ${error.message}`);
+    }
+    throw error;
   }
 };
 

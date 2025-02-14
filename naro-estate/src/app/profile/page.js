@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import ProfileHeader from '@/components/react-components/user/profile/ProfileHeader';
 import ChangePassword from '@/components/react-components/user/profile/ChangePassword';
+import { Loader2 } from 'lucide-react';
 
 const Page = () => {
   const [profileData, setProfileData] = useState(null);
@@ -53,17 +54,27 @@ const Page = () => {
     }
   }, [isLoggedIn, loading, router, toast]);
 
+  if (loading || profileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-gray-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className=''>
-      {loading || profileLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className='my-10'>
-          <ProfileHeader user={profileData} />
-          <ChangePassword />
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-12 w-12 animate-spin text-gray-500" />
         </div>
-      )}
-    </div>
+      }
+    >
+      <div className="my-10">
+        <ProfileHeader user={profileData} />
+        <ChangePassword />
+      </div>
+    </Suspense>
   );
 };
 
