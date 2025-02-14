@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import ProfileHeader from '@/components/react-components/user/profile/ProfileHeader';
+import ChangePassword from '@/components/react-components/user/profile/ChangePassword';
 
 const Page = () => {
   const [profileData, setProfileData] = useState(null);
@@ -59,6 +60,7 @@ const Page = () => {
       ) : (
         <div className='my-10'>
           <ProfileHeader user={profileData} />
+          <ChangePassword />
         </div>
       )}
     </div>

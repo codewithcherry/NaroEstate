@@ -7,7 +7,7 @@ const publicPaths = [
   '/', '/listings', '/api/user/register', '/api/user/login', '/api/user/forgot-password',
   '/api/user/reset-password', '/api/user/about', '/contact-us', '/api/user/signout'
 ];
-const privatePaths = ['/api/user/profile', '/api/user/settings', '/api/user/my-listings','/api/user/update-user'];
+const privatePaths = ['/api/user/profile', '/api/user/settings', '/api/user/my-listings','/api/user/update-user','/api/user/change-password'];
 
 const isPublicPath = (pathname) => publicPaths.includes(pathname);
 const isPrivatePath = (pathname) => privatePaths.includes(pathname);
@@ -30,7 +30,7 @@ export const middleware = async (request) => {
   if (isPrivatePath(pathname)) {
     const token = request.headers.get('Authorization')?.split(' ')[1];
 
-    console.log('Authorization Token:', token);
+    // console.log('Authorization Token:', token);
 
     if (!token) {
       return NextResponse.json({ type: 'error', message: 'Unauthorized request! Token expired/does not exist!' }, { status: 401 });
@@ -45,7 +45,7 @@ export const middleware = async (request) => {
       response.headers.set('user', JSON.stringify(payload)); // Example: Add user info in response header
       return response;
     } catch (error) {
-      console.error('Token verification failed:', error);
+      // console.error('Token verification failed:', error);
       return NextResponse.json({ type: 'error', message: 'Unauthorized request! Token expired/does not exist!' }, { status: 401 });
     }
   }
