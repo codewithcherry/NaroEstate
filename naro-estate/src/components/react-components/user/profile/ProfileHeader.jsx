@@ -28,6 +28,15 @@ const ProfileHeader = ({ user }) => {
     guests: user?.guests || 0,
   });
 
+  const onImageUpload=(newProfileUrl)=>{
+    if (newProfileUrl) {
+      setProfile({...profile,imageUrl:newProfileUrl})
+    } else {
+      return 
+    }
+    
+  }
+
   return (
     <div className="text-primary p-4">
       <Card className="max-w-6xl mx-auto p-6 lg:p-8 rounded-2xl shadow-xl bg-white">
@@ -46,7 +55,7 @@ const ProfileHeader = ({ user }) => {
                 <Edit className="h-5 w-5" />
               </button>
               {/* Dialog Component */}
-              <ProfilePictureDialog open={open} setOpen={setOpen} />
+              <ProfilePictureDialog open={open} setOpen={setOpen} onImageUpload={onImageUpload}/>
             </div>
             <div className="mt-6 space-y-3">
               <div className="flex items-center justify-center text-xl font-semibold">

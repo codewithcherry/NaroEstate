@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef } from "react";
 import {
   Dialog,
@@ -60,32 +62,24 @@ const ProfilePictureDialog = ({ open, setOpen, onImageUpload }) => {
 
     setUploading(true);
     try {
-      const response = await axios.post("/api/upload-image", formData, {
+      const response = await axios.post("/api/upload/profile-image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           'Authorization':`Bearer ${token}`
         },
       });
-
-      if (response.status === 200) {
-        const data = response.data;
-        setPreviewUrl(data.url);
-        onImageUpload(data.url);
+      const data = response.data;
+      console.log(data)
+        setPreviewUrl(data.imageUrl);
+        onImageUpload(data.imageUrl);
         setOpen(false);
         setFile(null);
         toast({
           title: "Success",
           description: "Profile image updated successfully!",
-          variant: "success",
         });
-      } else {
-        toast({
-          title: "Upload Failed",
-          description: "There was an error uploading the image. Please try again.",
-          variant: "destructive",
-        });
-      }
     } catch (error) {
+        console.log(error)
       toast({
         title: "Error",
         description: `Error uploading file: ${error.response?.status || "Network Error"}`,
