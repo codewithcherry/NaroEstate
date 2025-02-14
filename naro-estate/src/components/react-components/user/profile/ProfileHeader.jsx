@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Edit, Mail, Phone, MapPin, Calendar, BadgeCheck } from 'lucide-react';
 import EditProfileForm from './EditProfileForm';
+import ProfilePictureDialog from './ProfilePictureDialog';
 
 const ProfileHeader = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState({
     firstname: user?.firstname || '',
     lastname: user?.lastname || '',
@@ -39,10 +41,12 @@ const ProfileHeader = ({ user }) => {
               />
               <button
                 className="absolute bottom-1 right-1 bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 z-10"
-                onClick={() => alert('Change Profile Picture')}
+                onClick={() => setOpen(true)}
               >
                 <Edit className="h-5 w-5" />
               </button>
+              {/* Dialog Component */}
+              <ProfilePictureDialog open={open} setOpen={setOpen} />
             </div>
             <div className="mt-6 space-y-3">
               <div className="flex items-center justify-center text-xl font-semibold">
