@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+'use client';
+
+import React, { useState, useRef } from "react";
 import {
   Accordion,
   AccordionItem,
@@ -108,7 +110,76 @@ const CreateListingForm = () => {
     },
   });
 
-  
+  // State for cover photo
+const [coverPhoto, setCoverPhoto] = useState(null);
+
+
+
+// State for property media images
+const [propertyMedia, setPropertyMedia] = useState([]);
+const [isUploading, setIsUploading] = useState(false);
+
+// Function to upload media image (mock API call)
+const uploadMediaImage = async (file) => {
+  setIsUploading(true);
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Example API call (replace with your actual API endpoint)
+    const response = await fetch('/api/upload-media', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.imageUrl; // Assuming the API response contains the image URL
+    } else {
+      throw new Error('Failed to upload image');
+    }
+  } catch (error) {
+    console.error(error);
+    alert('Image upload failed!');
+  } finally {
+    setIsUploading(false);
+  }
+};
+
+// Handler for uploading media images
+const handleMediaImageUpload = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const imageUrl = await uploadMediaImage(file);
+    if (imageUrl) {
+      setPropertyMedia([...propertyMedia, imageUrl]); // Add uploaded image URL to the array
+    }
+  }
+};
+
+// Handler to delete image from media array
+const handleMediaImageDelete = (imageUrl) => {
+  setPropertyMedia(propertyMedia.filter((url) => url !== imageUrl)); // Remove image from the array
+};
+
+
+// Function to check if cover photo is uploaded
+const isCoverPhotoUploaded = () => {
+  return coverPhoto !== null;
+};
+
+// Handler for uploading cover photo
+const handleCoverPhotoUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    setCoverPhoto(URL.createObjectURL(file)); // Temporarily showing the uploaded image
+  }
+};
+
+// Handler for deleting cover photo
+const handleCoverPhotoDelete = () => {
+  setCoverPhoto(null); // Clear the cover photo
+};
 
   // Handle amenities change
   const handleAmenitiesChange = (category, amenity) => {
@@ -123,8 +194,22 @@ const CreateListingForm = () => {
 
   // Check if the property form is completed
   const isPropertyFormCompleted = () => {
-    const { title, description, propertyType, propertyStatus, listingType, rentPrice, salePrice } = propertyInfo;
-    if (!title || !description || !propertyType || !propertyStatus || !listingType) {
+    const {
+      title,
+      description,
+      propertyType,
+      propertyStatus,
+      listingType,
+      rentPrice,
+      salePrice,
+    } = propertyInfo;
+    if (
+      !title ||
+      !description ||
+      !propertyType ||
+      !propertyStatus ||
+      !listingType
+    ) {
       return false;
     }
     if (listingType === "rent" && !rentPrice) return false;
@@ -140,7 +225,8 @@ const CreateListingForm = () => {
 
   // Check if the property details form is completed
   const isPropertyDetailsFormCompleted = () => {
-    const { baths, beds, kitchen, furnishType, parking, floorArea } = propertyDetails;
+    const { baths, beds, kitchen, furnishType, parking, floorArea } =
+      propertyDetails;
     return baths && beds && kitchen && furnishType && parking && floorArea;
   };
 
@@ -180,7 +266,9 @@ const CreateListingForm = () => {
             Property General Information
             <span
               className={`ml-2 text-xs  font-medium py-1 px-3 rounded-full ${
-                isPropertyFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                isPropertyFormCompleted()
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
               }`}
             >
               {isPropertyFormCompleted() ? "Completed" : "Incomplete"}
@@ -190,7 +278,12 @@ const CreateListingForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Title */}
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-slate-700">Title</label>
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Title
+                </label>
                 <Input
                   name="title"
                   value={propertyInfo.title}
@@ -202,7 +295,12 @@ const CreateListingForm = () => {
 
               {/* Description */}
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-slate-700">Description</label>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Description
+                </label>
                 <Input
                   name="description"
                   value={propertyInfo.description}
@@ -214,7 +312,12 @@ const CreateListingForm = () => {
 
               {/* Property Type */}
               <div>
-                <label htmlFor="propertyType" className="block text-sm font-medium text-slate-700">Property Type</label>
+                <label
+                  htmlFor="propertyType"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Property Type
+                </label>
                 <select
                   name="propertyType"
                   value={propertyInfo.propertyType}
@@ -233,7 +336,12 @@ const CreateListingForm = () => {
 
               {/* Property Status */}
               <div>
-                <label htmlFor="propertyStatus" className="block text-sm font-medium text-slate-700">Property Status</label>
+                <label
+                  htmlFor="propertyStatus"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Property Status
+                </label>
                 <select
                   name="propertyStatus"
                   value={propertyInfo.propertyStatus}
@@ -250,7 +358,12 @@ const CreateListingForm = () => {
 
               {/* Listing Type */}
               <div>
-                <label htmlFor="listingType" className="block text-sm font-medium text-slate-700">Listing Type</label>
+                <label
+                  htmlFor="listingType"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Listing Type
+                </label>
                 <select
                   name="listingType"
                   value={propertyInfo.listingType}
@@ -266,9 +379,15 @@ const CreateListingForm = () => {
               </div>
 
               {/* Conditionally render Rent Price or Sale Price based on the listingType */}
-              {propertyInfo.listingType === "rent" || propertyInfo.listingType === "all" ? (
+              {propertyInfo.listingType === "rent" ||
+              propertyInfo.listingType === "all" ? (
                 <div>
-                  <label htmlFor="rentPrice" className="block text-sm font-medium text-slate-700">Rent Price</label>
+                  <label
+                    htmlFor="rentPrice"
+                    className="block text-sm font-medium text-slate-700"
+                  >
+                    Rent Price
+                  </label>
                   <Input
                     name="rentPrice"
                     value={propertyInfo.rentPrice}
@@ -279,9 +398,15 @@ const CreateListingForm = () => {
                 </div>
               ) : null}
 
-              {propertyInfo.listingType === "sale" || propertyInfo.listingType === "all" ? (
+              {propertyInfo.listingType === "sale" ||
+              propertyInfo.listingType === "all" ? (
                 <div>
-                  <label htmlFor="salePrice" className="block text-sm font-medium text-slate-700">Sale Price</label>
+                  <label
+                    htmlFor="salePrice"
+                    className="block text-sm font-medium text-slate-700"
+                  >
+                    Sale Price
+                  </label>
                   <Input
                     name="salePrice"
                     value={propertyInfo.salePrice}
@@ -301,7 +426,9 @@ const CreateListingForm = () => {
             Address Information
             <span
               className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                isAddressFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                isAddressFormCompleted()
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
               }`}
             >
               {isAddressFormCompleted() ? "Completed" : "Incomplete"}
@@ -311,7 +438,12 @@ const CreateListingForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Door Number */}
               <div>
-                <label htmlFor="doorNumber" className="block text-sm font-medium text-slate-700">Door Number</label>
+                <label
+                  htmlFor="doorNumber"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Door Number
+                </label>
                 <Input
                   name="doorNumber"
                   value={addressInfo.doorNumber}
@@ -323,7 +455,12 @@ const CreateListingForm = () => {
 
               {/* Street or Locality */}
               <div>
-                <label htmlFor="streetOrLocality" className="block text-sm font-medium text-slate-700">Street/Locality</label>
+                <label
+                  htmlFor="streetOrLocality"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Street/Locality
+                </label>
                 <Input
                   name="streetOrLocality"
                   value={addressInfo.streetOrLocality}
@@ -335,7 +472,12 @@ const CreateListingForm = () => {
 
               {/* City */}
               <div>
-                <label htmlFor="city" className="block text-sm font-medium text-slate-700">City</label>
+                <label
+                  htmlFor="city"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  City
+                </label>
                 <Input
                   name="city"
                   value={addressInfo.city}
@@ -347,7 +489,12 @@ const CreateListingForm = () => {
 
               {/* State */}
               <div>
-                <label htmlFor="state" className="block text-sm font-medium text-slate-700">State</label>
+                <label
+                  htmlFor="state"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  State
+                </label>
                 <Input
                   name="state"
                   value={addressInfo.state}
@@ -359,7 +506,12 @@ const CreateListingForm = () => {
 
               {/* Zip Code */}
               <div>
-                <label htmlFor="zipCode" className="block text-sm font-medium text-slate-700">Zip Code</label>
+                <label
+                  htmlFor="zipCode"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Zip Code
+                </label>
                 <Input
                   name="zipCode"
                   value={addressInfo.zipCode}
@@ -378,7 +530,9 @@ const CreateListingForm = () => {
             Property Details
             <span
               className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                isPropertyDetailsFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                isPropertyDetailsFormCompleted()
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
               }`}
             >
               {isPropertyDetailsFormCompleted() ? "Completed" : "Incomplete"}
@@ -388,7 +542,12 @@ const CreateListingForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Baths */}
               <div>
-                <label htmlFor="baths" className="block text-sm font-medium text-slate-700">Number of Baths</label>
+                <label
+                  htmlFor="baths"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Number of Baths
+                </label>
                 <Input
                   name="baths"
                   value={propertyDetails.baths}
@@ -400,7 +559,12 @@ const CreateListingForm = () => {
 
               {/* Beds */}
               <div>
-                <label htmlFor="beds" className="block text-sm font-medium text-slate-700">Number of Beds</label>
+                <label
+                  htmlFor="beds"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Number of Beds
+                </label>
                 <Input
                   name="beds"
                   value={propertyDetails.beds}
@@ -412,7 +576,12 @@ const CreateListingForm = () => {
 
               {/* Kitchen */}
               <div>
-                <label htmlFor="kitchen" className="block text-sm font-medium text-slate-700">Kitchen</label>
+                <label
+                  htmlFor="kitchen"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Kitchen
+                </label>
                 <Input
                   name="kitchen"
                   value={propertyDetails.kitchen}
@@ -424,7 +593,12 @@ const CreateListingForm = () => {
 
               {/* Furnish Type */}
               <div>
-                <label htmlFor="furnishType" className="block text-sm font-medium text-slate-700">Furnish Type</label>
+                <label
+                  htmlFor="furnishType"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Furnish Type
+                </label>
                 <select
                   name="furnishType"
                   value={propertyDetails.furnishType}
@@ -440,7 +614,12 @@ const CreateListingForm = () => {
 
               {/* Parking */}
               <div>
-                <label htmlFor="parking" className="block text-sm font-medium text-slate-700">Parking</label>
+                <label
+                  htmlFor="parking"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Parking
+                </label>
                 <select
                   name="parking"
                   value={propertyDetails.parking}
@@ -453,11 +632,14 @@ const CreateListingForm = () => {
                 </select>
               </div>
 
-              
-
               {/* Floor Area */}
               <div>
-                <label htmlFor="floorArea" className="block text-sm font-medium text-slate-700">Floor Area (sqft)</label>
+                <label
+                  htmlFor="floorArea"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Floor Area (sqft)
+                </label>
                 <Input
                   name="floorArea"
                   value={propertyDetails.floorArea}
@@ -470,11 +652,10 @@ const CreateListingForm = () => {
           </AccordionContent>
         </AccordionItem>
 
-         {/* Property Amenities Accordion */}
-         <AccordionItem value="item-4">
+        {/* Property Amenities Accordion */}
+        <AccordionItem value="item-4">
           <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
             Property Amenities
-            
           </AccordionTrigger>
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -489,7 +670,10 @@ const CreateListingForm = () => {
                     "parking",
                     "hotWater",
                   ].map((amenity) => (
-                    <label key={amenity} className="flex items-center space-x-2">
+                    <label
+                      key={amenity}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         checked={amenities.basic[amenity]}
@@ -503,7 +687,9 @@ const CreateListingForm = () => {
 
               {/* Kitchen Amenities */}
               <div>
-                <h3 className="font-medium text-slate-700">Kitchen Amenities</h3>
+                <h3 className="font-medium text-slate-700">
+                  Kitchen Amenities
+                </h3>
                 <div className="space-y-2">
                   {[
                     "fullyEquippedKitchen",
@@ -516,11 +702,16 @@ const CreateListingForm = () => {
                     "stove",
                     "cookingUtensils",
                   ].map((amenity) => (
-                    <label key={amenity} className="flex items-center space-x-2">
+                    <label
+                      key={amenity}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         checked={amenities.kitchen[amenity]}
-                        onChange={() => handleAmenitiesChange("kitchen", amenity)}
+                        onChange={() =>
+                          handleAmenitiesChange("kitchen", amenity)
+                        }
                       />
                       <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
                     </label>
@@ -530,7 +721,9 @@ const CreateListingForm = () => {
 
               {/* Bathroom Amenities */}
               <div>
-                <h3 className="font-medium text-slate-700">Bathroom Amenities</h3>
+                <h3 className="font-medium text-slate-700">
+                  Bathroom Amenities
+                </h3>
                 <div className="space-y-2">
                   {[
                     "bathtub",
@@ -540,11 +733,16 @@ const CreateListingForm = () => {
                     "towels",
                     "washingMachine",
                   ].map((amenity) => (
-                    <label key={amenity} className="flex items-center space-x-2">
+                    <label
+                      key={amenity}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         checked={amenities.bathroom[amenity]}
-                        onChange={() => handleAmenitiesChange("bathroom", amenity)}
+                        onChange={() =>
+                          handleAmenitiesChange("bathroom", amenity)
+                        }
                       />
                       <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
                     </label>
@@ -563,11 +761,16 @@ const CreateListingForm = () => {
                     "boardGames",
                     "musicSystem",
                   ].map((amenity) => (
-                    <label key={amenity} className="flex items-center space-x-2">
+                    <label
+                      key={amenity}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         checked={amenities.entertainment[amenity]}
-                        onChange={() => handleAmenitiesChange("entertainment", amenity)}
+                        onChange={() =>
+                          handleAmenitiesChange("entertainment", amenity)
+                        }
                       />
                       <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
                     </label>
@@ -577,7 +780,9 @@ const CreateListingForm = () => {
 
               {/* Outdoor Amenities */}
               <div>
-                <h3 className="font-medium text-slate-700">Outdoor Amenities</h3>
+                <h3 className="font-medium text-slate-700">
+                  Outdoor Amenities
+                </h3>
                 <div className="space-y-2">
                   {[
                     "balconyPatio",
@@ -587,11 +792,16 @@ const CreateListingForm = () => {
                     "swimmingPool",
                     "hotTub",
                   ].map((amenity) => (
-                    <label key={amenity} className="flex items-center space-x-2">
+                    <label
+                      key={amenity}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         checked={amenities.outdoor[amenity]}
-                        onChange={() => handleAmenitiesChange("outdoor", amenity)}
+                        onChange={() =>
+                          handleAmenitiesChange("outdoor", amenity)
+                        }
                       />
                       <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
                     </label>
@@ -601,6 +811,104 @@ const CreateListingForm = () => {
             </div>
           </AccordionContent>
         </AccordionItem>
+
+        {/* Property Media Accordion */}
+<AccordionItem value="item-5">
+  <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+    Property Cover Photo
+    <span
+      className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${isCoverPhotoUploaded() ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+    >
+      {isCoverPhotoUploaded() ? "Completed" : "Incomplete"}
+    </span>
+  </AccordionTrigger>
+  <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+    <div className="relative">
+      {/* Input for cover photo upload */}
+      <label className="block text-sm font-medium text-slate-700">Upload Cover Photo</label>
+      {/* Cover Photo Clickable Area */}
+      <div 
+        onClick={() => document.getElementById('cover-photo-input').click()}
+        className={`mt-2  ${coverPhoto ? 'cursor-pointer' : 'cursor-pointer border-2 border-dashed border-slate-300'}`}
+      >
+        {/* Show cover photo if uploaded */}
+        {coverPhoto ? (
+          <div className="relative">
+            <img 
+              src={coverPhoto} 
+              alt="cover-photo" 
+              className="object-cover h-52 w-full rounded-lg"
+            />
+            {/* Delete button appears on hover */}
+            <button
+              onClick={handleCoverPhotoDelete}
+              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-70 hover:opacity-100"
+            >
+              X
+            </button>
+          </div>
+        ) : (
+          <p className="text-center text-slate-400 h-52">Click to upload a cover photo</p>
+        )}
+      </div>
+      {/* Hidden file input for cover photo */}
+      <input
+        type="file"
+        id="cover-photo-input"
+        accept="image/*"
+        onChange={handleCoverPhotoUpload}
+        className="hidden"
+      />
+    </div>
+  </AccordionContent>
+</AccordionItem>
+
+{/* Property Media Accordion for Multiple Image Upload */}
+<AccordionItem value="item-6">
+  <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+    Property Media (Multiple Images)
+    <span
+      className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${propertyMedia.length > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+    >
+      {propertyMedia.length > 0 ? "Completed" : "Incomplete"}
+    </span>
+  </AccordionTrigger>
+  <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+    {/* Input for uploading media */}
+    <div>
+      <label className="block text-sm font-medium text-slate-700">Upload Property Media</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleMediaImageUpload}
+        className="mt-2 py-2 px-4 border rounded-lg bg-slate-50"
+        disabled={isUploading} // Disable during upload
+      />
+    </div>
+
+    {/* Display uploaded media images with delete buttons */}
+    <div className="mt-6 grid grid-cols-3 gap-4">
+      {propertyMedia.map((imageUrl, index) => (
+        <div key={index} className="relative">
+          <img 
+            src={imageUrl} 
+            alt={`property-media-${index}`}
+            className="object-cover w-full h-40 rounded-lg"
+          />
+          {/* Delete button */}
+          <button
+            onClick={() => handleMediaImageDelete(imageUrl)}
+            className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-70 hover:opacity-100"
+          >
+            X
+          </button>
+        </div>
+      ))}
+    </div>
+
+    {isUploading && <p className="mt-4 text-sm text-slate-600">Uploading...</p>}
+  </AccordionContent>
+</AccordionItem>
       </Accordion>
     </div>
   );
