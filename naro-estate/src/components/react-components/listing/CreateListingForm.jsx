@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 const CreateListingForm = () => {
+  // State for property info
   const [propertyInfo, setPropertyInfo] = useState({
     title: "",
     description: "",
@@ -18,7 +19,110 @@ const CreateListingForm = () => {
     rentPrice: "",
   });
 
-  const isFormCompleted = () => {
+  // State for address info
+  const [addressInfo, setAddressInfo] = useState({
+    doorNumber: "",
+    streetOrLocality: "",
+    city: "",
+    state: "",
+    zipCode: "",
+  });
+
+  // State for property details
+  const [propertyDetails, setPropertyDetails] = useState({
+    baths: "",
+    beds: "",
+    kitchen: "",
+    furnishType: "",
+    parking: "",
+    floorArea: "",
+  });
+
+  const [amenities, setAmenities] = useState({
+    basic: {
+      airConditioning: false,
+      heating: false,
+      wifi: false,
+      parking: false,
+      hotWater: false,
+    },
+    kitchen: {
+      fullyEquippedKitchen: false,
+      microwave: false,
+      refrigerator: false,
+      dishwasher: false,
+      coffeeMaker: false,
+      oven: false,
+      toaster: false,
+      stove: false,
+      cookingUtensils: false,
+    },
+    bathroom: {
+      bathtub: false,
+      shower: false,
+      toiletries: false,
+      hairDryer: false,
+      towels: false,
+      washingMachine: false,
+    },
+    entertainment: {
+      cableTV: false,
+      streamingServices: false,
+      booksAndMagazines: false,
+      boardGames: false,
+      musicSystem: false,
+    },
+    outdoor: {
+      balconyPatio: false,
+      privateGarden: false,
+      bbqGrill: false,
+      outdoorDiningArea: false,
+      swimmingPool: false,
+      hotTub: false,
+    },
+    security: {
+      securityCameras: false,
+      gatedProperty: false,
+      alarmSystem: false,
+      safe: false,
+      smokeDetectors: false,
+      carbonMonoxideDetectors: false,
+    },
+    accessibility: {
+      elevator: false,
+      wheelchairAccessible: false,
+      rampAccess: false,
+    },
+    pet: {
+      petFriendly: false,
+      petBowls: false,
+      fencedYard: false,
+    },
+    additional: {
+      gym: false,
+      spa: false,
+      fireplace: false,
+      washerDryer: false,
+      highChairs: false,
+      crib: false,
+    },
+  });
+
+  
+
+  // Handle amenities change
+  const handleAmenitiesChange = (category, amenity) => {
+    setAmenities({
+      ...amenities,
+      [category]: {
+        ...amenities[category],
+        [amenity]: !amenities[category][amenity],
+      },
+    });
+  };
+
+  // Check if the property form is completed
+  const isPropertyFormCompleted = () => {
     const { title, description, propertyType, propertyStatus, listingType, rentPrice, salePrice } = propertyInfo;
     if (!title || !description || !propertyType || !propertyStatus || !listingType) {
       return false;
@@ -28,7 +132,20 @@ const CreateListingForm = () => {
     return true;
   };
 
-  const handleInputChange = (e) => {
+  // Check if the address form is completed
+  const isAddressFormCompleted = () => {
+    const { doorNumber, streetOrLocality, city, state, zipCode } = addressInfo;
+    return doorNumber && streetOrLocality && city && state && zipCode;
+  };
+
+  // Check if the property details form is completed
+  const isPropertyDetailsFormCompleted = () => {
+    const { baths, beds, kitchen, furnishType, parking, floorArea } = propertyDetails;
+    return baths && beds && kitchen && furnishType && parking && floorArea;
+  };
+
+  // Handle change for property info
+  const handlePropertyInputChange = (e) => {
     const { name, value } = e.target;
     setPropertyInfo({
       ...propertyInfo,
@@ -36,18 +153,37 @@ const CreateListingForm = () => {
     });
   };
 
+  // Handle change for address info
+  const handleAddressInputChange = (e) => {
+    const { name, value } = e.target;
+    setAddressInfo({
+      ...addressInfo,
+      [name]: value,
+    });
+  };
+
+  // Handle change for property details
+  const handlePropertyDetailsInputChange = (e) => {
+    const { name, value } = e.target;
+    setPropertyDetails({
+      ...propertyDetails,
+      [name]: value,
+    });
+  };
+
   return (
     <div className="space-y-6 p-8 max-w-4xl mx-auto">
       <Accordion type="single" collapsible>
+        {/* General Property Information Accordion */}
         <AccordionItem value="item-1">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
             Property General Information
             <span
-              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                isFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+              className={`ml-2 text-xs  font-medium py-1 px-3 rounded-full ${
+                isPropertyFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
               }`}
             >
-              {isFormCompleted() ? "Completed" : "Incomplete"}
+              {isPropertyFormCompleted() ? "Completed" : "Incomplete"}
             </span>
           </AccordionTrigger>
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
@@ -59,7 +195,7 @@ const CreateListingForm = () => {
                   name="title"
                   value={propertyInfo.title}
                   placeholder="Enter the property name"
-                  onChange={handleInputChange}
+                  onChange={handlePropertyInputChange}
                   className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                 />
               </div>
@@ -71,7 +207,7 @@ const CreateListingForm = () => {
                   name="description"
                   value={propertyInfo.description}
                   placeholder="Enter a description of the property"
-                  onChange={handleInputChange}
+                  onChange={handlePropertyInputChange}
                   className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                 />
               </div>
@@ -82,7 +218,7 @@ const CreateListingForm = () => {
                 <select
                   name="propertyType"
                   value={propertyInfo.propertyType}
-                  onChange={handleInputChange}
+                  onChange={handlePropertyInputChange}
                   className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                 >
                   <option value="">Select Property Type</option>
@@ -101,7 +237,7 @@ const CreateListingForm = () => {
                 <select
                   name="propertyStatus"
                   value={propertyInfo.propertyStatus}
-                  onChange={handleInputChange}
+                  onChange={handlePropertyInputChange}
                   className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                 >
                   <option value="">Select Property Status</option>
@@ -118,7 +254,7 @@ const CreateListingForm = () => {
                 <select
                   name="listingType"
                   value={propertyInfo.listingType}
-                  onChange={handleInputChange}
+                  onChange={handlePropertyInputChange}
                   className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                 >
                   <option value="">Select Listing Type</option>
@@ -137,7 +273,7 @@ const CreateListingForm = () => {
                     name="rentPrice"
                     value={propertyInfo.rentPrice}
                     placeholder="Enter the rent price"
-                    onChange={handleInputChange}
+                    onChange={handlePropertyInputChange}
                     className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                   />
                 </div>
@@ -150,11 +286,318 @@ const CreateListingForm = () => {
                     name="salePrice"
                     value={propertyInfo.salePrice}
                     placeholder="Enter the sale price"
-                    onChange={handleInputChange}
+                    onChange={handlePropertyInputChange}
                     className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                   />
                 </div>
               ) : null}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Address Information Accordion */}
+        <AccordionItem value="item-2">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+            Address Information
+            <span
+              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
+                isAddressFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+              }`}
+            >
+              {isAddressFormCompleted() ? "Completed" : "Incomplete"}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Door Number */}
+              <div>
+                <label htmlFor="doorNumber" className="block text-sm font-medium text-slate-700">Door Number</label>
+                <Input
+                  name="doorNumber"
+                  value={addressInfo.doorNumber}
+                  placeholder="Enter door number"
+                  onChange={handleAddressInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* Street or Locality */}
+              <div>
+                <label htmlFor="streetOrLocality" className="block text-sm font-medium text-slate-700">Street/Locality</label>
+                <Input
+                  name="streetOrLocality"
+                  value={addressInfo.streetOrLocality}
+                  placeholder="Enter street or locality"
+                  onChange={handleAddressInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* City */}
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium text-slate-700">City</label>
+                <Input
+                  name="city"
+                  value={addressInfo.city}
+                  placeholder="Enter city"
+                  onChange={handleAddressInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* State */}
+              <div>
+                <label htmlFor="state" className="block text-sm font-medium text-slate-700">State</label>
+                <Input
+                  name="state"
+                  value={addressInfo.state}
+                  placeholder="Enter state"
+                  onChange={handleAddressInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* Zip Code */}
+              <div>
+                <label htmlFor="zipCode" className="block text-sm font-medium text-slate-700">Zip Code</label>
+                <Input
+                  name="zipCode"
+                  value={addressInfo.zipCode}
+                  placeholder="Enter zip code"
+                  onChange={handleAddressInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Property Details Accordion */}
+        <AccordionItem value="item-3">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+            Property Details
+            <span
+              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
+                isPropertyDetailsFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+              }`}
+            >
+              {isPropertyDetailsFormCompleted() ? "Completed" : "Incomplete"}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Baths */}
+              <div>
+                <label htmlFor="baths" className="block text-sm font-medium text-slate-700">Number of Baths</label>
+                <Input
+                  name="baths"
+                  value={propertyDetails.baths}
+                  placeholder="Enter the number of baths"
+                  onChange={handlePropertyDetailsInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* Beds */}
+              <div>
+                <label htmlFor="beds" className="block text-sm font-medium text-slate-700">Number of Beds</label>
+                <Input
+                  name="beds"
+                  value={propertyDetails.beds}
+                  placeholder="Enter the number of beds"
+                  onChange={handlePropertyDetailsInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* Kitchen */}
+              <div>
+                <label htmlFor="kitchen" className="block text-sm font-medium text-slate-700">Kitchen</label>
+                <Input
+                  name="kitchen"
+                  value={propertyDetails.kitchen}
+                  placeholder="Enter kitchen details"
+                  onChange={handlePropertyDetailsInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+
+              {/* Furnish Type */}
+              <div>
+                <label htmlFor="furnishType" className="block text-sm font-medium text-slate-700">Furnish Type</label>
+                <select
+                  name="furnishType"
+                  value={propertyDetails.furnishType}
+                  onChange={handlePropertyDetailsInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                >
+                  <option value="">Select Furnish Type</option>
+                  <option value="furnished">Furnished</option>
+                  <option value="semi-furnished">Semi-Furnished</option>
+                  <option value="unfurnished">Unfurnished</option>
+                </select>
+              </div>
+
+              {/* Parking */}
+              <div>
+                <label htmlFor="parking" className="block text-sm font-medium text-slate-700">Parking</label>
+                <select
+                  name="parking"
+                  value={propertyDetails.parking}
+                  onChange={handlePropertyDetailsInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                >
+                  <option value="">Select Parking Availability</option>
+                  <option value="available">Available</option>
+                  <option value="not-available">Not Available</option>
+                </select>
+              </div>
+
+              
+
+              {/* Floor Area */}
+              <div>
+                <label htmlFor="floorArea" className="block text-sm font-medium text-slate-700">Floor Area (sqft)</label>
+                <Input
+                  name="floorArea"
+                  value={propertyDetails.floorArea}
+                  placeholder="Enter floor area in square feet"
+                  onChange={handlePropertyDetailsInputChange}
+                  className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+         {/* Property Amenities Accordion */}
+         <AccordionItem value="item-4">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+            Property Amenities
+            
+          </AccordionTrigger>
+          <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Basic Amenities */}
+              <div>
+                <h3 className="font-medium text-slate-700">Basic Amenities</h3>
+                <div className="space-y-2">
+                  {[
+                    "airConditioning",
+                    "heating",
+                    "wifi",
+                    "parking",
+                    "hotWater",
+                  ].map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={amenities.basic[amenity]}
+                        onChange={() => handleAmenitiesChange("basic", amenity)}
+                      />
+                      <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Kitchen Amenities */}
+              <div>
+                <h3 className="font-medium text-slate-700">Kitchen Amenities</h3>
+                <div className="space-y-2">
+                  {[
+                    "fullyEquippedKitchen",
+                    "microwave",
+                    "refrigerator",
+                    "dishwasher",
+                    "coffeeMaker",
+                    "oven",
+                    "toaster",
+                    "stove",
+                    "cookingUtensils",
+                  ].map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={amenities.kitchen[amenity]}
+                        onChange={() => handleAmenitiesChange("kitchen", amenity)}
+                      />
+                      <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bathroom Amenities */}
+              <div>
+                <h3 className="font-medium text-slate-700">Bathroom Amenities</h3>
+                <div className="space-y-2">
+                  {[
+                    "bathtub",
+                    "shower",
+                    "toiletries",
+                    "hairDryer",
+                    "towels",
+                    "washingMachine",
+                  ].map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={amenities.bathroom[amenity]}
+                        onChange={() => handleAmenitiesChange("bathroom", amenity)}
+                      />
+                      <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Entertainment */}
+              <div>
+                <h3 className="font-medium text-slate-700">Entertainment</h3>
+                <div className="space-y-2">
+                  {[
+                    "cableTV",
+                    "streamingServices",
+                    "booksAndMagazines",
+                    "boardGames",
+                    "musicSystem",
+                  ].map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={amenities.entertainment[amenity]}
+                        onChange={() => handleAmenitiesChange("entertainment", amenity)}
+                      />
+                      <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Outdoor Amenities */}
+              <div>
+                <h3 className="font-medium text-slate-700">Outdoor Amenities</h3>
+                <div className="space-y-2">
+                  {[
+                    "balconyPatio",
+                    "privateGarden",
+                    "bbqGrill",
+                    "outdoorDiningArea",
+                    "swimmingPool",
+                    "hotTub",
+                  ].map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={amenities.outdoor[amenity]}
+                        onChange={() => handleAmenitiesChange("outdoor", amenity)}
+                      />
+                      <span>{amenity.replace(/([A-Z])/g, " $1")}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           </AccordionContent>
         </AccordionItem>
