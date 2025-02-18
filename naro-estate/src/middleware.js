@@ -5,7 +5,7 @@ const jwt_secret = process.env.JWTOKEN_SECRET;
 
 const publicPaths = [
   "/",
-  "/listings",
+  "/api/listings",
   "/api/user/register",
   "/api/user/login",
   "/api/user/forgot-password",
