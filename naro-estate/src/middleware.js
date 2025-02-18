@@ -7,7 +7,7 @@ const publicPaths = [
   '/', '/listings', '/api/user/register', '/api/user/login', '/api/user/forgot-password',
   '/api/user/reset-password', '/api/user/about', '/contact-us', '/api/user/signout'
 ];
-const privatePaths = ['/api/user/profile', '/api/user/settings', '/api/user/my-listings','/api/user/update-user','/api/user/change-password','/api/upload/profile-image'];
+const privatePaths = ['/api/user/profile', '/api/user/settings', '/api/user/my-listings','/api/user/update-user','/api/user/change-password','/api/upload/profile-image','/api/upload/property-media'];
 
 const isPublicPath = (pathname) => publicPaths.includes(pathname);
 const isPrivatePath = (pathname) => privatePaths.includes(pathname);

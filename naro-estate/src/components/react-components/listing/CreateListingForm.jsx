@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useRef } from "react";
 import {
@@ -8,6 +8,9 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+
 
 const CreateListingForm = () => {
   // State for property info
@@ -111,75 +114,85 @@ const CreateListingForm = () => {
   });
 
   // State for cover photo
-const [coverPhoto, setCoverPhoto] = useState(null);
+  const [coverPhoto, setCoverPhoto] = useState(null);
 
+  // State for property media images
+  const [propertyMedia, setPropertyMedia] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
 
+  const {toast} =useToast();
 
-// State for property media images
-const [propertyMedia, setPropertyMedia] = useState([]);
-const [isUploading, setIsUploading] = useState(false);
+  const token=localStorage.getItem('authToken')
 
-// Function to upload media image (mock API call)
-const uploadMediaImage = async (file) => {
-  setIsUploading(true);
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
+  // Function to upload media image (mock API call)
+  const uploadMediaImage = async (file) => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    // Example API call (replace with your actual API endpoint)
-    const response = await fetch('/api/upload-media', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return data.imageUrl; // Assuming the API response contains the image URL
-    } else {
-      throw new Error('Failed to upload image');
+      // Example API call (replace with your actual API endpoint)
+      const response = await axios.post("/api/upload/property-media", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          'Authorization':`Bearer ${token}`
+        },
+      })
+      const data=response.data;
+      toast({
+        title:data.type,
+        description:data.message
+      })
+      return data.imageUrl;
+    } catch (error) {
+      console.error(error);
+      toast({
+        title:error?.response?.data.type,
+        description:error?.response?.data.message,
+        variant:'destructive'
+      })
+    } finally {
+      setIsUploading(false);
     }
-  } catch (error) {
-    console.error(error);
-    alert('Image upload failed!');
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
-// Handler for uploading media images
-const handleMediaImageUpload = async (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const imageUrl = await uploadMediaImage(file);
-    if (imageUrl) {
-      setPropertyMedia([...propertyMedia, imageUrl]); // Add uploaded image URL to the array
+  // Handler for uploading media images
+  const handleMediaImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const imageUrl = await uploadMediaImage(file);
+      if (imageUrl) {
+        setPropertyMedia([...propertyMedia, imageUrl]); // Add uploaded image URL to the array
+      }
     }
-  }
-};
+  };
 
-// Handler to delete image from media array
-const handleMediaImageDelete = (imageUrl) => {
-  setPropertyMedia(propertyMedia.filter((url) => url !== imageUrl)); // Remove image from the array
-};
+  // Handler to delete image from media array
+  const handleMediaImageDelete = (imageUrl) => {
+    setPropertyMedia(propertyMedia.filter((url) => url !== imageUrl)); // Remove image from the array
+  };
 
+  // Function to check if cover photo is uploaded
+  const isCoverPhotoUploaded = () => {
+    return coverPhoto !== null;
+  };
 
-// Function to check if cover photo is uploaded
-const isCoverPhotoUploaded = () => {
-  return coverPhoto !== null;
-};
+  // Handler for uploading cover photo
+  const handleCoverPhotoUpload = async(event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    if (file) {
+      const imageUrl = await uploadMediaImage(file);
+      if (imageUrl) {
+      setCoverPhoto(imageUrl); // Temporarily showing the uploaded image
+      }
+    }
+  };
 
-// Handler for uploading cover photo
-const handleCoverPhotoUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    setCoverPhoto(URL.createObjectURL(file)); // Temporarily showing the uploaded image
-  }
-};
-
-// Handler for deleting cover photo
-const handleCoverPhotoDelete = () => {
-  setCoverPhoto(null); // Clear the cover photo
-};
+  // Handler for deleting cover photo
+  const handleCoverPhotoDelete = () => {
+    setCoverPhoto(null); // Clear the cover photo
+  };
 
   // Handle amenities change
   const handleAmenitiesChange = (category, amenity) => {
@@ -813,102 +826,124 @@ const handleCoverPhotoDelete = () => {
         </AccordionItem>
 
         {/* Property Media Accordion */}
-<AccordionItem value="item-5">
-  <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-    Property Cover Photo
-    <span
-      className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${isCoverPhotoUploaded() ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
-    >
-      {isCoverPhotoUploaded() ? "Completed" : "Incomplete"}
-    </span>
-  </AccordionTrigger>
-  <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
-    <div className="relative">
-      {/* Input for cover photo upload */}
-      <label className="block text-sm font-medium text-slate-700">Upload Cover Photo</label>
-      {/* Cover Photo Clickable Area */}
-      <div 
-        onClick={() => document.getElementById('cover-photo-input').click()}
-        className={`mt-2  ${coverPhoto ? 'cursor-pointer' : 'cursor-pointer border-2 border-dashed border-slate-300'}`}
-      >
-        {/* Show cover photo if uploaded */}
-        {coverPhoto ? (
-          <div className="relative">
-            <img 
-              src={coverPhoto} 
-              alt="cover-photo" 
-              className="object-cover h-52 w-full rounded-lg"
-            />
-            {/* Delete button appears on hover */}
-            <button
-              onClick={handleCoverPhotoDelete}
-              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-70 hover:opacity-100"
+        <AccordionItem value="item-5">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+            Property Cover Photo
+            <span
+              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
+                isCoverPhotoUploaded()
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
+              }`}
             >
-              X
-            </button>
-          </div>
-        ) : (
-          <p className="text-center text-slate-400 h-52">Click to upload a cover photo</p>
-        )}
-      </div>
-      {/* Hidden file input for cover photo */}
-      <input
-        type="file"
-        id="cover-photo-input"
-        accept="image/*"
-        onChange={handleCoverPhotoUpload}
-        className="hidden"
-      />
-    </div>
-  </AccordionContent>
-</AccordionItem>
+              {isCoverPhotoUploaded() ? "Completed" : "Incomplete"}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+            <div className="relative">
+              {/* Input for cover photo upload */}
+              <label className="block text-sm font-medium text-slate-700">
+                Upload Cover Photo
+              </label>
+              {/* Cover Photo Clickable Area */}
+              <div
+                onClick={() =>
+                  document.getElementById("cover-photo-input").click()
+                }
+                className={`mt-2  ${
+                  coverPhoto
+                    ? "cursor-pointer"
+                    : "cursor-pointer border-2 border-dashed border-slate-300"
+                }`}
+              >
+                {/* Show cover photo if uploaded */}
+                {coverPhoto ? (
+                  <div className="relative">
+                    <img
+                      src={coverPhoto}
+                      alt="cover-photo"
+                      className="object-cover h-52 w-full rounded-lg"
+                    />
+                    {/* Delete button appears on hover */}
+                    <button
+                      onClick={handleCoverPhotoDelete}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-70 hover:opacity-100"
+                    >
+                      X
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-center text-slate-400 h-52">
+                    Click to upload a cover photo
+                  </p>
+                )}
+              </div>
+              {/* Hidden file input for cover photo */}
+              <input
+                type="file"
+                id="cover-photo-input"
+                accept="image/*"
+                onChange={handleCoverPhotoUpload}
+                className="hidden"
+              />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-{/* Property Media Accordion for Multiple Image Upload */}
-<AccordionItem value="item-6">
-  <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-    Property Media (Multiple Images)
-    <span
-      className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${propertyMedia.length > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
-    >
-      {propertyMedia.length > 0 ? "Completed" : "Incomplete"}
-    </span>
-  </AccordionTrigger>
-  <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
-    {/* Input for uploading media */}
-    <div>
-      <label className="block text-sm font-medium text-slate-700">Upload Property Media</label>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleMediaImageUpload}
-        className="mt-2 py-2 px-4 border rounded-lg bg-slate-50"
-        disabled={isUploading} // Disable during upload
-      />
-    </div>
+        {/* Property Media Accordion for Multiple Image Upload */}
+        <AccordionItem value="item-6">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+            Property Media (Multiple Images)
+            <span
+              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
+                propertyMedia.length > 0
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              {propertyMedia.length > 0 ? "Completed" : "Incomplete"}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
+            {/* Input for uploading media */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700">
+                Upload Property Media
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleMediaImageUpload}
+                className="mt-2 py-2 px-4 border rounded-lg bg-slate-50"
+                disabled={isUploading} // Disable during upload
+              />
+            </div>
 
-    {/* Display uploaded media images with delete buttons */}
-    <div className="mt-6 grid grid-cols-3 gap-4">
-      {propertyMedia.map((imageUrl, index) => (
-        <div key={index} className="relative">
-          <img 
-            src={imageUrl} 
-            alt={`property-media-${index}`}
-            className="object-cover w-full h-40 rounded-lg"
-          />
-          {/* Delete button */}
-          <button
-            onClick={() => handleMediaImageDelete(imageUrl)}
-            className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-70 hover:opacity-100"
-          >
-            X
-          </button>
-        </div>
-      ))}
-    </div>
+            {/* Display uploaded media images with delete buttons */}
+            <div className="mt-6 grid grid-cols-3 gap-4">
+              {propertyMedia.map((imageUrl, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={imageUrl}
+                    alt={`property-media-${index}`}
+                    className="object-cover w-full h-40 rounded-lg"
+                  />
+                  {/* Delete button */}
+                  <button
+                    onClick={() => handleMediaImageDelete(imageUrl)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-70 hover:opacity-100"
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+            </div>
 
-    {isUploading && <p className="mt-4 text-sm text-slate-600">Uploading...</p>}
-  </AccordionContent>
-</AccordionItem>
+            {isUploading && (
+              <p className="mt-4 text-sm text-slate-600">Uploading...</p>
+            )}
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
     </div>
   );
