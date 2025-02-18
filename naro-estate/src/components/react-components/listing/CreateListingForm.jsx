@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-
+import { Button } from "@/components/ui/button";
 
 const CreateListingForm = () => {
   // State for property info
@@ -20,8 +20,8 @@ const CreateListingForm = () => {
     propertyType: "",
     propertyStatus: "",
     listingType: "",
-    salePrice: "",
-    rentPrice: "",
+    salePrice: 0,
+    rentPrice: 0,
   });
 
   // State for address info
@@ -35,12 +35,12 @@ const CreateListingForm = () => {
 
   // State for property details
   const [propertyDetails, setPropertyDetails] = useState({
-    baths: "",
-    beds: "",
+    baths: 0,
+    beds: 0,
     kitchen: "",
     furnishType: "",
     parking: "",
-    floorArea: "",
+    floorArea: 0,
   });
 
   const [amenities, setAmenities] = useState({
@@ -120,9 +120,9 @@ const CreateListingForm = () => {
   const [propertyMedia, setPropertyMedia] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const {toast} =useToast();
+  const { toast } = useToast();
 
-  const token=localStorage.getItem('authToken')
+  const token = localStorage.getItem("authToken");
 
   // Function to upload media image (mock API call)
   const uploadMediaImage = async (file) => {
@@ -132,25 +132,29 @@ const CreateListingForm = () => {
       formData.append("file", file);
 
       // Example API call (replace with your actual API endpoint)
-      const response = await axios.post("/api/upload/property-media", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          'Authorization':`Bearer ${token}`
-        },
-      })
-      const data=response.data;
+      const response = await axios.post(
+        "/api/upload/property-media",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = response.data;
       toast({
-        title:data.type,
-        description:data.message
-      })
+        title: data.type,
+        description: data.message,
+      });
       return data.imageUrl;
     } catch (error) {
       console.error(error);
       toast({
-        title:error?.response?.data.type,
-        description:error?.response?.data.message,
-        variant:'destructive'
-      })
+        title: error?.response?.data.type,
+        description: error?.response?.data.message,
+        variant: "destructive",
+      });
     } finally {
       setIsUploading(false);
     }
@@ -178,13 +182,13 @@ const CreateListingForm = () => {
   };
 
   // Handler for uploading cover photo
-  const handleCoverPhotoUpload = async(event) => {
+  const handleCoverPhotoUpload = async (event) => {
     event.preventDefault();
     const file = event.target.files[0];
     if (file) {
       const imageUrl = await uploadMediaImage(file);
       if (imageUrl) {
-      setCoverPhoto(imageUrl); // Temporarily showing the uploaded image
+        setCoverPhoto(imageUrl); // Temporarily showing the uploaded image
       }
     }
   };
@@ -270,22 +274,38 @@ const CreateListingForm = () => {
     });
   };
 
+  const handleDiscard = () => {};
+
+  const createNewListing = async () => {
+   console.log(propertyDetails)
+   console.log(addressInfo)
+   console.log(propertyInfo)
+   console.log(propertyMedia)
+   console.log(coverPhoto)
+   console.log(amenities)
+  };
+
   return (
     <div className="space-y-6 p-8 max-w-4xl mx-auto">
-      <Accordion type="single" collapsible>
+      <Accordion
+        type="single"
+        defaultValue="item-1"
+        className="space-y-4"
+        collapsible
+      >
         {/* General Property Information Accordion */}
         <AccordionItem value="item-1">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-            Property General Information
-            <span
-              className={`ml-2 text-xs  font-medium py-1 px-3 rounded-full ${
+          <AccordionTrigger className="w-full flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
+            <h2 className="flex-1 text-left">Property General Information</h2>
+            <h3
+              className={`ml-2 text-xs text-center font-medium py-1 px-3 rounded-full mx-2 ${
                 isPropertyFormCompleted()
                   ? "bg-green-500 text-white"
                   : "bg-red-500 text-white"
               }`}
             >
               {isPropertyFormCompleted() ? "Completed" : "Incomplete"}
-            </span>
+            </h3>
           </AccordionTrigger>
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -403,6 +423,7 @@ const CreateListingForm = () => {
                   </label>
                   <Input
                     name="rentPrice"
+                    type="number"
                     value={propertyInfo.rentPrice}
                     placeholder="Enter the rent price"
                     onChange={handlePropertyInputChange}
@@ -422,6 +443,7 @@ const CreateListingForm = () => {
                   </label>
                   <Input
                     name="salePrice"
+                    type="number"
                     value={propertyInfo.salePrice}
                     placeholder="Enter the sale price"
                     onChange={handlePropertyInputChange}
@@ -435,18 +457,17 @@ const CreateListingForm = () => {
 
         {/* Address Information Accordion */}
         <AccordionItem value="item-2">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-            Address Information
-            <span
-              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                isAddressFormCompleted()
-                  ? "bg-green-500 text-white"
-                  : "bg-red-500 text-white"
-              }`}
-            >
-              {isAddressFormCompleted() ? "Completed" : "Incomplete"}
-            </span>
-          </AccordionTrigger>
+        <AccordionTrigger className="w-full flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
+  <span className="flex-1 text-left">Address Information</span>
+  <span
+    className={`mx-2 text-xs font-medium py-1 px-3 rounded-full ${
+      isAddressFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
+  >
+    {isAddressFormCompleted() ? "Completed" : "Incomplete"}
+  </span>
+</AccordionTrigger>
+
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Door Number */}
@@ -539,18 +560,17 @@ const CreateListingForm = () => {
 
         {/* Property Details Accordion */}
         <AccordionItem value="item-3">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-            Property Details
-            <span
-              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                isPropertyDetailsFormCompleted()
-                  ? "bg-green-500 text-white"
-                  : "bg-red-500 text-white"
-              }`}
-            >
-              {isPropertyDetailsFormCompleted() ? "Completed" : "Incomplete"}
-            </span>
-          </AccordionTrigger>
+        <AccordionTrigger className="w-full flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
+  <span className="flex-1 text-left">Property Details</span>
+  <span
+    className={`mx-2 text-xs font-medium py-1 px-3 rounded-full ${
+      isPropertyDetailsFormCompleted() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
+  >
+    {isPropertyDetailsFormCompleted() ? "Completed" : "Incomplete"}
+  </span>
+</AccordionTrigger>
+
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Baths */}
@@ -563,6 +583,7 @@ const CreateListingForm = () => {
                 </label>
                 <Input
                   name="baths"
+                  type="number"
                   value={propertyDetails.baths}
                   placeholder="Enter the number of baths"
                   onChange={handlePropertyDetailsInputChange}
@@ -580,6 +601,7 @@ const CreateListingForm = () => {
                 </label>
                 <Input
                   name="beds"
+                  type="number"
                   value={propertyDetails.beds}
                   placeholder="Enter the number of beds"
                   onChange={handlePropertyDetailsInputChange}
@@ -655,6 +677,7 @@ const CreateListingForm = () => {
                 </label>
                 <Input
                   name="floorArea"
+                  type="number"
                   value={propertyDetails.floorArea}
                   placeholder="Enter floor area in square feet"
                   onChange={handlePropertyDetailsInputChange}
@@ -667,7 +690,7 @@ const CreateListingForm = () => {
 
         {/* Property Amenities Accordion */}
         <AccordionItem value="item-4">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
+          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
             Property Amenities
           </AccordionTrigger>
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
@@ -827,18 +850,17 @@ const CreateListingForm = () => {
 
         {/* Property Media Accordion */}
         <AccordionItem value="item-5">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-            Property Cover Photo
-            <span
-              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                isCoverPhotoUploaded()
-                  ? "bg-green-500 text-white"
-                  : "bg-red-500 text-white"
-              }`}
-            >
-              {isCoverPhotoUploaded() ? "Completed" : "Incomplete"}
-            </span>
-          </AccordionTrigger>
+        <AccordionTrigger className="w-full flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
+  <span className="flex-1 text-left">Property Cover Photo</span>
+  <span
+    className={`mx-2 text-xs font-medium py-1 px-3 rounded-full ${
+      isCoverPhotoUploaded() ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
+  >
+    {isCoverPhotoUploaded() ? "Completed" : "Incomplete"}
+  </span>
+</AccordionTrigger>
+
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
             <div className="relative">
               {/* Input for cover photo upload */}
@@ -892,18 +914,17 @@ const CreateListingForm = () => {
 
         {/* Property Media Accordion for Multiple Image Upload */}
         <AccordionItem value="item-6">
-          <AccordionTrigger className="flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 transition-all">
-            Property Media (Multiple Images)
-            <span
-              className={`ml-2 text-xs font-medium py-1 px-3 rounded-full ${
-                propertyMedia.length > 0
-                  ? "bg-green-500 text-white"
-                  : "bg-red-500 text-white"
-              }`}
-            >
-              {propertyMedia.length > 0 ? "Completed" : "Incomplete"}
-            </span>
-          </AccordionTrigger>
+        <AccordionTrigger className="w-full flex justify-between items-center text-lg font-semibold text-slate-900 py-3 px-4 bg-white border-b-2 border-slate-200 rounded-md hover:bg-slate-50 hover:no-underline transition-all">
+  <span className="flex-1 text-left">Property Media (Multiple Images)</span>
+  <span
+    className={`mx-2 text-xs font-medium py-1 px-3 rounded-full ${
+      propertyMedia.length > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    }`}
+  >
+    {propertyMedia.length > 0 ? "Completed" : "Incomplete"}
+  </span>
+</AccordionTrigger>
+
           <AccordionContent className="bg-white p-6 space-y-6 shadow-md rounded-lg">
             {/* Input for uploading media */}
             <div>
@@ -945,6 +966,22 @@ const CreateListingForm = () => {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+      <div className="flex justify-end gap-4 mt-6">
+        <Button
+          type="button"
+          className="px-6 py-2 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 transition-all"
+          onClick={handleDiscard}
+        >
+          Discard
+        </Button>
+        <Button
+          type="button"
+          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition-all"
+          onClick={createNewListing}
+        >
+          Post Listing
+        </Button>
+      </div>
     </div>
   );
 };
