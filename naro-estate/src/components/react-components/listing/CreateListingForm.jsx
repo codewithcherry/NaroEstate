@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Accordion,
   AccordionItem,
@@ -11,8 +11,14 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const CreateListingForm = () => {
+
+ // state to tract post button enable
+  const [isPostEnable,setIsPostEnable]=useState(false);
+
   // State for property info
   const [propertyInfo, setPropertyInfo] = useState({
     title: "",
@@ -123,6 +129,108 @@ const CreateListingForm = () => {
   const { toast } = useToast();
 
   const token = localStorage.getItem("authToken");
+
+  const router=useRouter();
+
+  // function to reset all the states to intial value
+
+  const resetForm=()=>{
+    setPropertyInfo({
+      title: "",
+      description: "",
+      propertyType: "",
+      propertyStatus: "",
+      listingType: "",
+      salePrice: 0,
+      rentPrice: 0,
+    });
+    setPropertyDetails({
+      baths: 0,
+      beds: 0,
+      kitchen: "",
+      furnishType: "",
+      parking: "",
+      floorArea: 0,
+    });
+    setAddressInfo({
+      doorNumber: "",
+      streetOrLocality: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    });
+    setAmenities({
+      basic: {
+        airConditioning: false,
+        heating: false,
+        wifi: false,
+        parking: false,
+        hotWater: false,
+      },
+      kitchen: {
+        fullyEquippedKitchen: false,
+        microwave: false,
+        refrigerator: false,
+        dishwasher: false,
+        coffeeMaker: false,
+        oven: false,
+        toaster: false,
+        stove: false,
+        cookingUtensils: false,
+      },
+      bathroom: {
+        bathtub: false,
+        shower: false,
+        toiletries: false,
+        hairDryer: false,
+        towels: false,
+        washingMachine: false,
+      },
+      entertainment: {
+        cableTV: false,
+        streamingServices: false,
+        booksAndMagazines: false,
+        boardGames: false,
+        musicSystem: false,
+      },
+      outdoor: {
+        balconyPatio: false,
+        privateGarden: false,
+        bbqGrill: false,
+        outdoorDiningArea: false,
+        swimmingPool: false,
+        hotTub: false,
+      },
+      security: {
+        securityCameras: false,
+        gatedProperty: false,
+        alarmSystem: false,
+        safe: false,
+        smokeDetectors: false,
+        carbonMonoxideDetectors: false,
+      },
+      accessibility: {
+        elevator: false,
+        wheelchairAccessible: false,
+        rampAccess: false,
+      },
+      pet: {
+        petFriendly: false,
+        petBowls: false,
+        fencedYard: false,
+      },
+      additional: {
+        gym: false,
+        spa: false,
+        fireplace: false,
+        washerDryer: false,
+        highChairs: false,
+        crib: false,
+      },
+    });
+    setCoverPhoto(null);
+    setPropertyMedia([]);
+  }
 
   // Function to upload media image (mock API call)
   const uploadMediaImage = async (file) => {
@@ -274,16 +382,53 @@ const CreateListingForm = () => {
     });
   };
 
-  const handleDiscard = () => {};
+  const handleDiscard = () => {
+    resetForm();
+  };
+
+  const [createLoading,setCreateLoading]=useState(false)
 
   const createNewListing = async () => {
-   console.log(propertyDetails)
-   console.log(addressInfo)
-   console.log(propertyInfo)
-   console.log(propertyMedia)
-   console.log(coverPhoto)
-   console.log(amenities)
+   
+   try {
+    setCreateLoading(true)
+    const response=await axios.post('/api/user/create-listing',{
+      propertyDetails,
+      addressInfo,
+      propertyInfo,
+      coverPhoto,
+      propertyMedia,
+      amenities
+    },{
+      headers:{
+        'Authorization':`Bearer ${token}`,
+        "Content-Type":'application/json'
+      }
+    })
+    const data=response.data;
+    toast({
+      title:data.type,
+      description:data.message,
+    })
+    resetForm()
+    router.push(`/listings/${data.listingId}`);
+   } catch (error) {
+    console.log(error)
+    toast({
+      title:'error',
+      description:error?.response.data?.message
+    })
+   }
+   finally{
+    setCreateLoading(false)
+   }
   };
+
+  useEffect(()=>{
+    if(isAddressFormCompleted && isCoverPhotoUploaded && isPropertyDetailsFormCompleted && isPropertyFormCompleted && (propertyMedia.length > 0)){
+      setIsPostEnable(true)
+    }
+  },[isAddressFormCompleted,isCoverPhotoUploaded,isPropertyDetailsFormCompleted,isPropertyFormCompleted,propertyMedia])
 
   return (
     <div className="space-y-6 p-8 max-w-4xl mx-auto">
@@ -978,12 +1123,15 @@ const CreateListingForm = () => {
           type="button"
           className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition-all"
           onClick={createNewListing}
+          disabled={!isPostEnable}
         >
-          Post Listing
+          {
+            createLoading?<Loader2 className="h-4 w-4 text-slate-300 animate-spin" />:"Post Listing"
+          }
         </Button>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default CreateListingForm;
