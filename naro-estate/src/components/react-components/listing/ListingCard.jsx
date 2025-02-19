@@ -1,10 +1,17 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { MapPin, Bed, Bath, Ruler } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const ListingCard = ({ listing }) => {
+
+  const router=useRouter();
+
+  const handleCardClick=(id)=>{
+    router.push(`/listings/${id}`)
+  }
   return (
-    <Card className="relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 max-w-sm w-full">
+    <Card className="relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 max-w-sm w-full" onClick={()=>handleCardClick(listing._id)}>
       <div className="relative group">
         <img
           src={listing.coverPhoto || "/placeholder.jpg"} // Fallback image
