@@ -1,63 +1,66 @@
-'use client';
+"use client";
 
-import ListingCard from '@/components/react-components/listing/ListingCard';
-import { useToast } from '@/hooks/use-toast';
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from "react";
+import axios from "axios";
+import ListingCard from "@/components/react-components/listing/ListingCard";
+import { Loader2 } from "lucide-react";
 
-const Page = () => {
-  const [listings, setListings] = useState(null); // Using `null` to distinguish between no data & loading
-  const [isFetching, setIsFetching] = useState(false);
-  const { toast } = useToast();
-
-  const fetchListings = async () => {
-    try {
-      setIsFetching(true);
-
-      const response = await axios.get('/api/listings', {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      setListings(response.data.listings);
-      console.log(response.data.listings)
-    } catch (error) {
-      console.error("Error fetching listings:", error);
-      
-      toast({
-        title: error?.response?.data?.type || "Error",
-        description: error?.response?.data?.message || "Something went wrong. Please try again."
-      });
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
+const ListingGrid = () => {
+  const [listings, setListings] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const response = await axios.get("/api/listings");
+        setListings(response.data.listings);
+      } catch (err) {
+        setError(new Error("Failed to fetch listings"));
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchListings();
   }, []);
 
-  return (
-    <div>
-      <h1>This is the listing page</h1>
-      
-      {/* Button to manually fetch listings */}
-      <button onClick={fetchListings} disabled={isFetching}>
-        {isFetching ? "Loading..." : "Fetch Listings"}
-      </button>
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
+      </div>
+    );
 
-      {/* Display Listings */}
-      {listings ? (
-        <div className='grid grid-cols-3'>
-          {listings.map((listing) => (
-            <ListingCard  key={listing._id}/>
-          ))}
-        </div>
-      ) : (
-        !isFetching && <p>No listings available</p>
-      )}
+  if (error) throw error; // This will trigger the `error.js` page in Next.js
+
+  return (
+    <div className="container mx-auto ">
+      <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 justify-items-center">
+        {listings && listings.length > 0 ? (
+          listings.map((listing) => (
+            <ListingCard key={listing._id} listing={listing} />
+          ))
+        ) : (
+          <p className="col-span-full text-center text-gray-600">No listings available</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Page = () => {
+  return (
+    <div className="container mx-auto px-4 h-screen">
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center h-screen">
+            <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
+          </div>
+        }
+      >
+        <ListingGrid />
+      </Suspense>
     </div>
   );
 };
