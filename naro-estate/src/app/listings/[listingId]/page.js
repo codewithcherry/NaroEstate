@@ -1,22 +1,23 @@
 'use client';
 
 import ViewListing from '@/components/react-components/listing/ViewListing';
-import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const Page = () => {
   const { listingId } = useParams();
   const [listingLoading, setListingLoading] = useState(false);
   const [listing, setListing] = useState({});
-  const { toast } = useToast();
+  const [error, setError] = useState(null);
 
   const fetchListing = async (id) => {
     if (!id) return;
     try {
       setListingLoading(true);
-      const response = await axios.get(`/api/get-listing?listingId=${id}`, {
+      setError(null);
+      const response = await axios.get(`/api/listings/${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -26,10 +27,7 @@ const Page = () => {
       setListing(data);
     } catch (error) {
       console.log(error);
-      toast({
-        title: error?.response?.data?.type,
-        description: error?.response?.data?.message || 'Could not fetch the listing! Try again later.',
-      });
+      setError(new Error(error?.response?.data?.message || 'Could not fetch the listing! Try again later.'));
     } finally {
       setListingLoading(false);
     }
@@ -39,11 +37,25 @@ const Page = () => {
     if (listingId) fetchListing(listingId);
   }, [listingId]);
 
+  if (error) {
+    throw error;
+  }
+
   return (
-    <div>
+    
+      <Suspense fallback={<div className="flex justify-center items-center h-svh "><Loader2 className="animate-spin w-6 h-6 text-gray-500" /></div>}>
+        {listingLoading ? (
+          <div className="flex justify-center items-center h-svh ">
+            <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
+          </div>
+        ) : (
+          <div>
       <h1>This is the listing ID page</h1>
-      {listingLoading ? <p>Loading...</p> : <ViewListing listing={listing} />}
-    </div>
+          <ViewListing listing={listing} />
+          </div>
+        )}
+      </Suspense>
+   
   );
 };
 
