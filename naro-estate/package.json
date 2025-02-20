@@ -25,6 +25,7 @@
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "formidable": "^3.5.2",
+    "framer-motion": "^12.4.7",
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.473.0",
