@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wind, Utensils, Bath, Tv, Leaf, Shield, Accessibility, Dog, Dumbbell } from "lucide-react";
 
-export default function AmenitiesComponent({ amenities }) {
+export default function AmenitiesComponent({ amenities = {} }) {
   const [open, setOpen] = useState(false);
 
   const categoryIcons = {
@@ -20,17 +20,17 @@ export default function AmenitiesComponent({ amenities }) {
   };
 
   return (
-    <Card className=" mx-auto p-6  rounded-xl shadow-lg mt-6">
+    <Card className="mx-auto p-6 rounded-xl shadow-lg mt-6">
       <CardContent className="space-y-4">
         <h2 className="text-lg font-semibold">What this place offers</h2>
-        
+
         {/* Basic Amenities */}
         <div className="grid grid-cols-2 gap-4 mt-2">
-          <p>{amenities.basic.airConditioning ? "✔ Air Conditioning" : "✖ Air Conditioning"}</p>
-          <p>{amenities.basic.heating ? "✔ Heating" : "✖ Heating"}</p>
-          <p>{amenities.basic.wifi ? "✔ WiFi" : "✖ WiFi"}</p>
-          <p>{amenities.basic.parking ? "✔ Parking" : "✖ Parking"}</p>
-          <p>{amenities.basic.hotWater ? "✔ Hot Water" : "✖ Hot Water"}</p>
+          <p>{amenities?.basic?.airConditioning ?? false ? "✔ Air Conditioning" : "✖ Air Conditioning"}</p>
+          <p>{amenities?.basic?.heating ?? false ? "✔ Heating" : "✖ Heating"}</p>
+          <p>{amenities?.basic?.wifi ?? false ? "✔ WiFi" : "✖ WiFi"}</p>
+          <p>{amenities?.basic?.parking ?? false ? "✔ Parking" : "✖ Parking"}</p>
+          <p>{amenities?.basic?.hotWater ?? false ? "✔ Hot Water" : "✖ Hot Water"}</p>
         </div>
 
         {/* Show More Button & Dialog */}
@@ -49,7 +49,7 @@ export default function AmenitiesComponent({ amenities }) {
                     {categoryIcons[category]} <span>{category}</span>
                   </h3>
                   <div className="grid grid-cols-2 gap-4 mt-2">
-                    {Object.entries(items).map(([amenity, available]) => (
+                    {Object.entries(items || {}).map(([amenity, available]) => (
                       <p key={amenity}>{available ? `✔ ${amenity.replace(/([A-Z])/g, ' $1').trim()}` : `✖ ${amenity.replace(/([A-Z])/g, ' $1').trim()}`}</p>
                     ))}
                   </div>

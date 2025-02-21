@@ -1,42 +1,45 @@
-import { Star, Trophy, Home, Calendar, Heart, Map, Pin, LocateIcon, MapPin } from "lucide-react";
+import { Star, Trophy, Home, Calendar, Heart, MapPin, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 
-export default function RoomListing({listing}) {
+export default function RoomListing({ listing }) {
   const [open, setOpen] = useState(false);
 
   function getYearsFromToday(createdAt) {
+    if (!createdAt) return "Less than a "; // Handle undefined createdAt
+
     const createdDate = new Date(createdAt);
     const today = new Date();
-    
+
     let yearsDiff = today.getFullYear() - createdDate.getFullYear();
 
-    // Adjust if today's date is before the anniversary of createdAt
     if (
-        today.getMonth() < createdDate.getMonth() ||
-        (today.getMonth() === createdDate.getMonth() && today.getDate() < createdDate.getDate())
+      today.getMonth() < createdDate.getMonth() ||
+      (today.getMonth() === createdDate.getMonth() && today.getDate() < createdDate.getDate())
     ) {
-        yearsDiff--;
+      yearsDiff--;
     }
 
     return yearsDiff < 1 ? "Less than a " : yearsDiff;
-}
+  }
 
-
-
+  // Prevent rendering if listing is undefined or missing essential data
+  if (!listing || !listing.address) return <Loader2 size={20}/>;
 
   return (
-    <Card className="container mx-auto p-6  rounded-xl shadow-lg">
+    <Card className="container mx-auto p-6 rounded-xl shadow-lg">
       <CardContent className="space-y-4">
         {/* Title */}
         <div>
-          <h1 className="text-2xl font-semibold">{listing.title}</h1>
+          <h1 className="text-2xl font-semibold">{listing.title ?? "Untitled Listing"}</h1>
           <div className="flex items-center gap-1">
             <MapPin className="w-4 h-4 text-blue-500" />
-            <p className="text-gray-600">{listing.address.doorNumber}, {listing.address.city}, {listing.address.state}</p>
+            <p className="text-gray-600">
+              {listing.address?.doorNumber ?? "N/A"}, {listing.address?.city ?? "Unknown"}, {listing.address?.state ?? "Unknown"}
+            </p>
           </div>
         </div>
 
@@ -48,20 +51,20 @@ export default function RoomListing({listing}) {
           </div>
           <div className="text-right">
             <p className="text-lg font-semibold flex items-center">
-              {listing.rating} <Star className="text-yellow-500 ml-1" size={16} />
+              {listing.rating ?? "No rating"} <Star className="text-yellow-500 ml-1" size={16} />
             </p>
-            <p className="text-sm text-gray-500">{listing.reviews.length} Reviews</p>
+            <p className="text-sm text-gray-500">{listing.reviews?.length ?? 0} Reviews</p>
           </div>
         </div>
 
         {/* Host Section */}
         <div className="flex items-center space-x-3">
           <Avatar>
-            <AvatarImage src={listing.createdBy.imageUrl} alt="Host" />
+            <AvatarImage src={listing.createdBy?.imageUrl ?? "/default-avatar.png"} alt="Host" />
           </Avatar>
           <div>
-            <p className="font-medium">{listing.createdBy.firstname}</p>
-            <p className="text-sm text-gray-500">Superhost · {getYearsFromToday(listing.createdBy.createdAt)} years hosting</p>
+            <p className="font-medium">{listing.createdBy?.firstname ?? "Unknown Host"}</p>
+            <p className="text-sm text-gray-500">Superhost · {getYearsFromToday(listing.createdBy?.createdAt)} years hosting</p>
           </div>
         </div>
 
@@ -73,7 +76,7 @@ export default function RoomListing({listing}) {
           </div>
           <div className="flex items-center space-x-2">
             <Home className="text-gray-700" size={20} />
-            <p className="text-sm">{listing.propertyType} in a {listing.listingType} unit - plus access to shared spaces.</p>
+            <p className="text-sm">{listing.propertyType ?? "Unknown property"} in a {listing.listingType ?? "Unknown type"} unit - plus access to shared spaces.</p>
           </div>
           <div className="flex items-center space-x-2">
             <Calendar className="text-gray-700" size={20} />
@@ -85,7 +88,7 @@ export default function RoomListing({listing}) {
         <div>
           <h2 className="text-lg font-semibold">About this place</h2>
           <p className="text-gray-700 text-sm mt-1">
-            {listing.description}
+            {listing.description ?? "No description available."}
           </p>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
