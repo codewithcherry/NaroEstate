@@ -7,6 +7,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import ListingMedia from "@/components/react-components/listing/ListingMedia";
 import RoomListing from "@/components/react-components/listing/RoomListing";
+import AmenitiesComponent from "@/components/react-components/listing/AmenitiesComponent";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -66,6 +67,7 @@ const Page = () => {
           {/* <ViewListing listing={listing} /> */}
           <ListingMedia coverPhoto={listing.coverPhoto} propertyMedia={listing.propertyMedia}/>
           <RoomListing listing={listing} />
+          <AmenitiesComponent amenities={listing.amenities}/>
         </div>
       )}
     </Suspense>
