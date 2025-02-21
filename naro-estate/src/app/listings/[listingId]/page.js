@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import ListingMedia from "@/components/react-components/listing/ListingMedia";
 import RoomListing from "@/components/react-components/listing/RoomListing";
 import AmenitiesComponent from "@/components/react-components/listing/AmenitiesComponent";
+import ListingDetails from "@/components/react-components/listing/ListingDetails";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -67,7 +68,10 @@ const Page = () => {
           {/* <ViewListing listing={listing} /> */}
           <ListingMedia coverPhoto={listing.coverPhoto} propertyMedia={listing.propertyMedia}/>
           <RoomListing listing={listing} />
+          <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
+          <ListingDetails listing={listing}/>
           <AmenitiesComponent amenities={listing.amenities}/>
+          </div>
         </div>
       )}
     </Suspense>
