@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import ListingMedia from "@/components/react-components/listing/ListingMedia";
+import RoomListing from "@/components/react-components/listing/RoomListing";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -64,6 +65,7 @@ const Page = () => {
           <h1 className=" px-6 mt-4 text-3xl font-bold">{listing.title}</h1>
           {/* <ViewListing listing={listing} /> */}
           <ListingMedia coverPhoto={listing.coverPhoto} propertyMedia={listing.propertyMedia}/>
+          <RoomListing listing={listing} />
         </div>
       )}
     </Suspense>
