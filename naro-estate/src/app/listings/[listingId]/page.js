@@ -9,6 +9,7 @@ import ListingMedia from "@/components/react-components/listing/ListingMedia";
 import RoomListing from "@/components/react-components/listing/RoomListing";
 import AmenitiesComponent from "@/components/react-components/listing/AmenitiesComponent";
 import ListingDetails from "@/components/react-components/listing/ListingDetails";
+import HostProfileCard from "@/components/react-components/listing/HostProfileCard";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -72,6 +73,7 @@ const Page = () => {
           <ListingDetails listing={listing}/>
           <AmenitiesComponent amenities={listing.amenities}/>
           </div>
+          <HostProfileCard host={listing.createdBy}/>
         </div>
       )}
     </Suspense>

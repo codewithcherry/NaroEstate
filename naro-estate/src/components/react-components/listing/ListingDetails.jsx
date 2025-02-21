@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Bath, Bed, Home, Layout, Tag, DollarSign, Lock, Utensils, ParkingCircle, Ruler, Loader2 } from "lucide-react";
 
 const ListingDetails = ({ listing }) => {
-  if (!listing) return <Loader2 className="w-8 h-8 animate-spin text-gray-500"/>; // Handle undefined listing
+  if (!listing) return <Loader2 className="w-8 h-8 animate-spin text-gray-500 "/>; // Handle undefined listing
 
   return (
     <Card className="container mx-auto p-6 rounded-xl shadow-lg mt-6">
