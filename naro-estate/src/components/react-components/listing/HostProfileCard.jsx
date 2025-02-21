@@ -4,37 +4,43 @@ import { BadgeCheck, MessageCircle, ShieldCheck, Globe, Briefcase } from "lucide
 
 const HostProfileCard = ({ host = {} }) => {
   return (
-    <div className="container mx-auto p-6">
+    <div className="mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-6">Meet your host</h2>
       <div className="grid md:grid-cols-2 gap-6">
         
         {/* Host Profile Card */}
         <Card className="p-6 gap-10 items-center text-center shadow-lg rounded-xl border bg-white">
-          <div className="flex flex-col md:flex-row justify-around items-center">
-            <div>
+          <div className="flex flex-col md:flex-row justify-around items-center w-full">
+            
+            {/* Host Image & Info */}
+            <div className="flex flex-col items-center">
               <img
                 src={host?.imageUrl ?? "/default-avatar.png"} 
                 alt="Host"
-                className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                className="w-40 h-40 rounded-full object-cover border-4 border-gray-200"
               />
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-semibold mt-3">
+              
+              {/* Host Name & Verification */}
+              <div className="flex flex-col items-center mt-3">
+                <h3 className="text-xl font-semibold">
                   {host?.firstname ?? "Unknown"} {host?.lastname ?? ""}
                 </h3>
-                <div className="flex items-center mt-3">
-                  <ShieldCheck className={`w-6 h-6 ${host?.isVerified ? "text-pink-500" : "text-gray-600"}`} />
-                  {host?.isVerified ? "Verified" : "Not Verified"}
+                <div className="flex items-center gap-1 mt-1">
+                  <ShieldCheck className={`w-5 h-5 ${host?.isVerified ? "text-pink-500" : "text-gray-600"}`} />
+                  <span className="text-sm text-gray-600">{host?.isVerified ? "Verified" : "Not Verified"}</span>
                 </div>
               </div>
+
+              {/* Superhost Badge */}
               {host?.isSuperhost && (
-                <p className="text-gray-500 flex items-center gap-1 text-sm">
+                <p className="text-gray-500 flex items-center gap-1 text-sm mt-1">
                   <BadgeCheck className="w-4 h-4 text-gray-700" /> Superhost
                 </p>
               )}
             </div>
 
             {/* Host Statistics */}
-            <div className="flex flex-col mt-4 text-gray-700 gap-y-2 text-sm">
+            <div className="flex md:flex-col flex-row w-full justify-between md:w-auto mt-4 text-gray-700 gap-y-2 text-sm">
               <div className="text-center border-b py-2">
                 <p className="font-semibold text-lg">{host?.properties ?? 0}</p>
                 <p className="text-gray-500">Properties</p>
@@ -43,7 +49,7 @@ const HostProfileCard = ({ host = {} }) => {
                 <p className="font-semibold text-lg">{host?.bookings ?? 0}</p>
                 <p className="text-gray-500">Bookings</p>
               </div>
-              <div className="text-center">
+              <div className="text-center border-b py-2">
                 <p className="font-semibold text-lg">{host?.guests ?? 0}</p>
                 <p className="text-gray-500">Guests</p>
               </div>
@@ -67,7 +73,7 @@ const HostProfileCard = ({ host = {} }) => {
         </Card>
 
         {/* Host Details */}
-        <div className="flex flex-col max-w-md justify-between">
+        <div className="flex flex-col max-w-md justify-between p-6">
           <div>
             <h3 className="text-lg font-semibold">{host?.firstname ?? "The host"} is a Superhost</h3>
             <p className="text-gray-600 mt-2 text-sm">
