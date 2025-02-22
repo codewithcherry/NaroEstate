@@ -10,6 +10,7 @@ import RoomListing from "@/components/react-components/listing/RoomListing";
 import AmenitiesComponent from "@/components/react-components/listing/AmenitiesComponent";
 import ListingDetails from "@/components/react-components/listing/ListingDetails";
 import HostProfileCard from "@/components/react-components/listing/HostProfileCard";
+import ReviewSection from "@/components/react-components/listing/ReviewSection";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -74,6 +75,7 @@ const Page = () => {
           <AmenitiesComponent amenities={listing.amenities}/>
           </div>
           <HostProfileCard host={listing.createdBy}/>
+          <ReviewSection />
         </div>
       )}
     </Suspense>
