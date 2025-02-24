@@ -11,6 +11,7 @@ import AmenitiesComponent from "@/components/react-components/listing/AmenitiesC
 import ListingDetails from "@/components/react-components/listing/ListingDetails";
 import HostProfileCard from "@/components/react-components/listing/HostProfileCard";
 import ReviewSection from "@/components/react-components/listing/ReviewSection";
+import BookListing from "@/components/react-components/listing/BookListing";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -69,7 +70,10 @@ const Page = () => {
           <h1 className=" px-6 mt-4 text-3xl font-bold">{listing.title}</h1>
           {/* <ViewListing listing={listing} /> */}
           <ListingMedia coverPhoto={listing.coverPhoto} propertyMedia={listing.propertyMedia}/>
+          <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
           <RoomListing listing={listing} />
+          <BookListing />
+          </div>
           <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
           <ListingDetails listing={listing}/>
           <AmenitiesComponent amenities={listing.amenities}/>
