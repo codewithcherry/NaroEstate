@@ -12,6 +12,8 @@ import ListingDetails from "@/components/react-components/listing/ListingDetails
 import HostProfileCard from "@/components/react-components/listing/HostProfileCard";
 import ReviewSection from "@/components/react-components/listing/ReviewSection";
 import BookListing from "@/components/react-components/listing/BookListing";
+import BookAgentAppointment from "@/components/react-components/listing/RequestAgentCall";
+import RequestAgentCall from "@/components/react-components/listing/RequestAgentCall";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -74,6 +76,7 @@ const Page = () => {
           <RoomListing listing={listing} />
           <BookListing />
           </div>
+          <RequestAgentCall />
           <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
           <ListingDetails listing={listing}/>
           <AmenitiesComponent amenities={listing.amenities}/>

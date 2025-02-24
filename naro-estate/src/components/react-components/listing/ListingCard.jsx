@@ -11,7 +11,7 @@ const ListingCard = ({ listing }) => {
     router.push(`/listings/${id}`)
   }
   return (
-    <Card className="relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 max-w-sm w-full" onClick={()=>handleCardClick(listing._id)}>
+    <Card className="relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-100 max-w-sm w-full hover:cursor-pointer" onClick={()=>handleCardClick(listing._id)}>
       <div className="relative group">
         <img
           src={listing.coverPhoto || "/placeholder.jpg"} // Fallback image
