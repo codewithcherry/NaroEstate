@@ -341,6 +341,7 @@ const CreateListingForm = () => {
     }
     if (listingType === "rent" && !rentPrice) return false;
     if (listingType === "sale" && !salePrice) return false;
+    if (listingType === "stay" && !stayPrice) return false;
     return true;
   };
 

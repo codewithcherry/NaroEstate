@@ -11,6 +11,7 @@ const listingSchema = new Schema({
   listingType: { type: String, required: true },
   salePrice: { type: Number, default: 0 },
   rentPrice: { type: Number, default: 0 },
+  stayPrice: { type: Number, default: 0 },
 
   // Address Info
   address: {
