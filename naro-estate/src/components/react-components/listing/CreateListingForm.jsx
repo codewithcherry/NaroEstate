@@ -28,6 +28,7 @@ const CreateListingForm = () => {
     listingType: "",
     salePrice: 0,
     rentPrice: 0,
+    stayPrice: '',
   });
 
   // State for address info
@@ -327,6 +328,7 @@ const CreateListingForm = () => {
       listingType,
       rentPrice,
       salePrice,
+      stayPrice
     } = propertyInfo;
     if (
       !title ||
@@ -549,6 +551,7 @@ const CreateListingForm = () => {
                   className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                 >
                   <option value="">Select Listing Type</option>
+                  <option value="stay">Stay</option>
                   <option value="rent">Rent</option>
                   <option value="sale">Sale</option>
                   <option value="lease">Lease</option>
@@ -591,6 +594,27 @@ const CreateListingForm = () => {
                     type="number"
                     value={propertyInfo.salePrice}
                     placeholder="Enter the sale price"
+                    onChange={handlePropertyInputChange}
+                    className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
+                  />
+                </div>
+              ) : null}
+
+               {/* Conditionally render Rent Price or Sale Price based on the listingType */}
+               {propertyInfo.listingType === "stay" ||
+              propertyInfo.listingType === "all" ? (
+                <div>
+                  <label
+                    htmlFor="stayPrice"
+                    className="block text-sm font-medium text-slate-700"
+                  >
+                    Rent Price
+                  </label>
+                  <Input
+                    name="stayPrice"
+                    type="number"
+                    value={propertyInfo.stayPrice}
+                    placeholder="Enter the stay price per night"
                     onChange={handlePropertyInputChange}
                     className="mt-2 p-3 w-full border rounded-lg border-slate-300 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-slate-500 transition-all"
                   />
