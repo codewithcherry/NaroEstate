@@ -28,17 +28,18 @@ const RequestAgentCall = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-6">
-      <Card className="w-full max-w-xl p-6 shadow-md bg-white rounded-lg border border-gray-200">
+    
+      <Card className="border rounded-xl shadow-lg p-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-800">
-            <PhoneCall className="w-6 h-6 text-blue-600" /> Request a Call from
-            an Agent
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-800 whitespace-nowrap">
+            <PhoneCall className="w-6 h-6 text-blue-600 " /> Request a Call from an Agent
           </CardTitle>
         </CardHeader>
+        <p className="text-sm text-blue-700 text-center mb-4">Please give your availability, our agent will reachout to you!</p>
         <CardContent>
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Preferred Date
@@ -77,6 +78,7 @@ const RequestAgentCall = () => {
                   required
                 />
               </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Additional Notes
@@ -108,7 +110,7 @@ const RequestAgentCall = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+  
   );
 };
 

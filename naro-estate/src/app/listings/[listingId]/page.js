@@ -72,11 +72,11 @@ const Page = () => {
           <h1 className=" px-6 mt-4 text-3xl font-bold">{listing.title}</h1>
           {/* <ViewListing listing={listing} /> */}
           <ListingMedia coverPhoto={listing.coverPhoto} propertyMedia={listing.propertyMedia}/>
-          <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
+          <div className="flex flex-col  gap-2 md:flex-row my-6 w-full">
           <RoomListing listing={listing} />
-          <BookListing />
+          {listing.listingType==="rent"?<BookListing />:<RequestAgentCall />}
           </div>
-          <RequestAgentCall />
+          
           <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
           <ListingDetails listing={listing}/>
           <AmenitiesComponent amenities={listing.amenities}/>
