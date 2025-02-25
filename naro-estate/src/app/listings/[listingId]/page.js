@@ -12,7 +12,7 @@ import ListingDetails from "@/components/react-components/listing/ListingDetails
 import HostProfileCard from "@/components/react-components/listing/HostProfileCard";
 import ReviewSection from "@/components/react-components/listing/ReviewSection";
 import BookListing from "@/components/react-components/listing/BookListing";
-import BookAgentAppointment from "@/components/react-components/listing/RequestAgentCall";
+import RentEnquiry from "@/components/react-components/listing/RentEnquiry";
 import RequestAgentCall from "@/components/react-components/listing/RequestAgentCall";
 
 const Page = () => {
@@ -71,17 +71,26 @@ const Page = () => {
         <div className="container mx-auto">
           <h1 className=" px-6 mt-4 text-3xl font-bold">{listing.title}</h1>
           {/* <ViewListing listing={listing} /> */}
-          <ListingMedia coverPhoto={listing.coverPhoto} propertyMedia={listing.propertyMedia}/>
+          <ListingMedia
+            coverPhoto={listing.coverPhoto}
+            propertyMedia={listing.propertyMedia}
+          />
           <div className="flex flex-col  gap-2 md:flex-row my-6 w-full">
-          <RoomListing listing={listing} />
-          {listing.listingType==="rent"?<BookListing />:<RequestAgentCall />}
+            <RoomListing listing={listing} />
+            {listing.listingType === "stay" ? (
+              <BookListing />
+            ) : listing.listingType === "rent" ? (
+              <RentEnquiry propertyId={listing._id}/>
+            ) : (
+              <RequestAgentCall />
+            )}
           </div>
-          
+
           <div className="flex flex-col gap-2 md:flex-row my-6 w-full">
-          <ListingDetails listing={listing}/>
-          <AmenitiesComponent amenities={listing.amenities}/>
+            <ListingDetails listing={listing} />
+            <AmenitiesComponent amenities={listing.amenities} />
           </div>
-          <HostProfileCard host={listing.createdBy}/>
+          <HostProfileCard host={listing.createdBy} />
           <ReviewSection />
         </div>
       )}
