@@ -28,7 +28,7 @@ const CreateListingForm = () => {
     listingType: "",
     salePrice: 0,
     rentPrice: 0,
-    stayPrice: '',
+    stayPrice: 0,
   });
 
   // State for address info
@@ -144,6 +144,7 @@ const CreateListingForm = () => {
       listingType: "",
       salePrice: 0,
       rentPrice: 0,
+      stayPrice:0,
     });
     setPropertyDetails({
       baths: 0,
@@ -609,7 +610,7 @@ const CreateListingForm = () => {
                     htmlFor="stayPrice"
                     className="block text-sm font-medium text-slate-700"
                   >
-                    Rent Price
+                    Stay Price
                   </label>
                   <Input
                     name="stayPrice"

@@ -4,14 +4,16 @@ import { MapPin, Bed, Bath, Ruler } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const ListingCard = ({ listing }) => {
+  const router = useRouter();
 
-  const router=useRouter();
-
-  const handleCardClick=(id)=>{
-    router.push(`/listings/${id}`)
-  }
+  const handleCardClick = (id) => {
+    router.push(`/listings/${id}`);
+  };
   return (
-    <Card className="relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-100 max-w-sm w-full hover:cursor-pointer" onClick={()=>handleCardClick(listing._id)}>
+    <Card
+      className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-100 max-w-sm w-full hover:cursor-pointer"
+      onClick={() => handleCardClick(listing._id)}
+    >
       <div className="relative group">
         <img
           src={listing.coverPhoto || "/placeholder.jpg"} // Fallback image
@@ -20,15 +22,19 @@ const ListingCard = ({ listing }) => {
           onError={(e) => (e.target.src = "/placeholder.jpg")} // Handle broken image
         />
         <div className="absolute top-4 left-4 bg-muted text-primary opacity-90 text-xs font-semibold px-3 py-1 rounded-md uppercase">
-          For {listing.listingType === "rent" ? "Rent" : "Sale"}
+          For {listing.listingType}
         </div>
       </div>
       <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
-        <h2 className="text-lg font-semibold truncate">{listing.title || "No Title"}</h2>
+        <h2 className="text-lg font-semibold truncate">
+          {listing.title || "No Title"}
+        </h2>
         <div className="flex items-center text-sm mt-1 text-gray-300">
           <MapPin className="w-4 h-4 mr-1" />
           <span>
-            {listing.address?.doorNumber ? `${listing.address.doorNumber}, ` : ""}
+            {listing.address?.doorNumber
+              ? `${listing.address.doorNumber}, `
+              : ""}
             {listing.address?.city || "Unknown Location"}
           </span>
         </div>
@@ -44,20 +50,36 @@ const ListingCard = ({ listing }) => {
             </div>
             <div className="flex items-center">
               <Ruler className="w-5 h-5 mr-1" />
-              <span>{listing.propertyDetails?.floorArea ? `${listing.propertyDetails.floorArea} sqft` : "N/A"}</span>
+              <span>
+                {listing.propertyDetails?.floorArea
+                  ? `${listing.propertyDetails.floorArea} sqft`
+                  : "N/A"}
+              </span>
             </div>
           </div>
           <div className="text-lg font-bold whitespace-nowrap mt-2 md:mt-0">
             {listing.listingType === "rent" ? (
               <div>
                 $
-                <span className="text-white font-medium">{listing.rentPrice || "N/A"}</span>
+                <span className="text-white font-medium">
+                  {listing.rentPrice || "N/A"}
+                </span>
                 <span className="text-gray-400 text-sm ml-1">/month</span>
+              </div>
+            ) : listing.listingType === "stay" ? (
+              <div>
+                $
+                <span className="text-white font-medium">
+                  {listing.stayPrice || "N/A"}
+                </span>
+                <span className="text-gray-400 text-sm ml-1">/night</span>
               </div>
             ) : (
               <div>
                 $
-                <span className="text-white font-medium">{listing.salePrice || "N/A"}</span>
+                <span className="text-white font-medium">
+                  {listing.salePrice || "N/A"}
+                </span>
               </div>
             )}
           </div>

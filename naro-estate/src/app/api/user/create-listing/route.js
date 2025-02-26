@@ -41,6 +41,7 @@ export const POST = async (request) => {
         listingType:  propertyInfo.listingType,
         salePrice:  propertyInfo.salePrice,
         rentPrice:  propertyInfo.rentPrice,
+        stayPrice: propertyInfo.stayPrice,
         address:addressInfo,
         propertyDetails:propertyDetails,
         amenities:amenities,
