@@ -82,7 +82,7 @@ const Page = () => {
             ) : listing.listingType === "rent" ? (
               <RentEnquiry propertyId={listing._id}/>
             ) : (
-              <RequestAgentCall />
+              <RequestAgentCall  listingId={listing._id}/>
             )}
           </div>
 

@@ -23,7 +23,8 @@ const privatePaths = [
   "/api/upload/profile-image",
   "/api/upload/property-media",
   "/api/user/create-listing",
-  "/api/rent-enquiry"
+  "/api/rent-enquiry",
+  "/api/sale-enquiry"
 ];
 
 const isPublicPath = (pathname) => publicPaths.includes(pathname);
