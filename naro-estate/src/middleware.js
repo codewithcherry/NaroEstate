@@ -22,7 +22,8 @@ const privatePaths = [
   "/api/user/change-password",
   "/api/upload/profile-image",
   "/api/upload/property-media",
-  "/api/user/create-listing"
+  "/api/user/create-listing",
+  "/api/rent-enquiry"
 ];
 
 const isPublicPath = (pathname) => publicPaths.includes(pathname);
