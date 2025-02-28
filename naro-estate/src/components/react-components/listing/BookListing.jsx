@@ -7,12 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const nightlyRate = 7000;
 
-const BookListing = () => {
+const BookListing = ({listing}) => {
   const bookedDates = [
     new Date("2025-03-10"),
     new Date("2025-03-11"),
     new Date("2025-03-15"),
   ];
+
+  const [nightlyRate ,setnightlyRate]= useState(listing.stayPrice);
 
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
@@ -48,7 +50,7 @@ const BookListing = () => {
   return (
     <Card className="max-w-md mx-auto p-6 border  rounded-lg shadow-lg">
       <CardContent>
-        <h2 className="text-xl font-semibold mb-4">${nightlyRate.toLocaleString()} <span className="text-gray-500">/night</span></h2>
+        <h2 className="text-xl font-semibold mb-4">${nightlyRate.toLocaleString()}<span className="text-gray-500 text-sm">/night</span></h2>
         <div className="grid grid-cols-2 gap-2 mb-4 border p-3 rounded-lg bg-gray-50 shadow-md">
           <div>
             <label className="block mb-1 text-gray-700 text-sm">Check-in</label>

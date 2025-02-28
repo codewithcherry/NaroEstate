@@ -78,7 +78,7 @@ const Page = () => {
           <div className="flex flex-col  gap-2 md:flex-row my-6 w-full">
             <RoomListing listing={listing} />
             {listing.listingType === "stay" ? (
-              <BookListing />
+              <BookListing listing={listing} />
             ) : listing.listingType === "rent" ? (
               <RentEnquiry propertyId={listing._id}/>
             ) : (
