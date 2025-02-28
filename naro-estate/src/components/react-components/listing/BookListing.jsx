@@ -4,8 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
 
-const nightlyRate = 7000;
+
 
 const BookListing = ({listing}) => {
   const bookedDates = [
@@ -20,6 +24,12 @@ const BookListing = ({listing}) => {
   const [checkOut, setCheckOut] = useState(null);
   const [guests, setGuests] = useState(1);
   const [error, setError] = useState("");
+  const [isReserveLoading,setIsReserveLoading]=useState(false);
+
+  const router=useRouter();
+  const {toast}=useToast();
+
+  const token=localStorage.getItem('authToken');
 
   const isDateUnavailable = (date) =>
     bookedDates.some(
@@ -44,8 +54,51 @@ const BookListing = ({listing}) => {
       return;
     }
     setError("");
-    alert("Booking confirmed!");
+    ReserveListing();
   };
+
+  const ReserveListing=async()=>{
+    try {
+
+      setIsReserveLoading(true);
+
+      const response=await axios.post('/api/reserve',
+        {
+          listingId:listing._id,
+          checkIn:checkIn,
+          checkOut:checkOut,
+          stayPrice:listing.stayPrice
+        },
+        {
+          headers:{
+            'Authorization':`Bearer ${token}`,
+            "Content-Type":'application/json'
+          }
+        }
+      )
+
+      const data=response.data;
+      console.log(data);
+      toast({
+        title:data?.type || 'success',
+        description:data?.message || 'Reserved Successfully will be redirected to payments page'
+      })
+      router.push(`/confirm-booking?token=${data.token}`)
+      setCheckIn(null)
+      setCheckOut(null)
+    } catch (error) {
+      console.log(error);
+      toast({
+        title:error?.response.data?.type || 'error',
+        description:error?.response.data?.message || "couldnt reserve the listing!!",
+        variant:'destructive'
+      })
+      setError(error.response.data?.message || 'Something went wrong')
+    }
+    finally{
+      setIsReserveLoading(false);
+    }
+  }
 
   return (
     <Card className="max-w-md mx-auto p-6 border  rounded-lg shadow-lg">
@@ -92,7 +145,9 @@ const BookListing = ({listing}) => {
         </div>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 text-white py-2" onClick={handleBooking}>
-          Reserve
+          {
+            isReserveLoading?<Loader2 className="w-4 h-4 text-white animate-spin"/>:"Reserve"
+          }
         </Button>
         <p className="text-center text-gray-500 text-sm mt-2">You won't be charged yet</p>
         <hr className="my-4" />
