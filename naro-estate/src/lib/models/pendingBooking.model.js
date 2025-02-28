@@ -23,6 +23,6 @@ const pendingBookingSchema = new Schema(
 );
 
 // Check if the model is already defined in Mongoose's internal registry
-const PendingBooking = mongoose.models.PendingBooking || mongoose.model("PendingBooking", userSchema);
+const PendingBooking = mongoose.models.PendingBooking || mongoose.model("PendingBooking", pendingBookingSchema);
 
 export default PendingBooking;
