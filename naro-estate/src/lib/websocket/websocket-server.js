@@ -1,11 +1,12 @@
+// websocket-server.js
 import { WebSocketServer } from "ws";
 import PendingBooking from "@/lib/models/pendingBooking.model";
 import connect from "@/lib/mongoDb/database";
 
 const clients = new Map();
 
-export const setupWebSocketServer = (server) => {
-  const wss = new WebSocketServer({ server });
+const startWebSocketServer = () => {
+  const wss = new WebSocketServer({ port: 4000 }); // WebSocket server on port 4000
 
   wss.on("connection", async (ws, req) => {
     const urlParams = new URL(req.url, `http://${req.headers.host}`);
@@ -39,7 +40,10 @@ export const setupWebSocketServer = (server) => {
     await sendQueueUpdate(listingId);
   });
 
-  console.log("WebSocket server started ✅");
+  console.log("✅ WebSocket server started on ws://localhost:4000");
+
+  // Clean up expired bookings every 10 seconds
+  setInterval(checkAndRemoveExpiredBookings, 10000);
 };
 
 // Send queue updates to all users in the same listing queue
@@ -63,7 +67,7 @@ const sendQueueUpdate = async (listingId) => {
 };
 
 // Remove expired tokens and notify next user
-export const checkAndRemoveExpiredBookings = async () => {
+const checkAndRemoveExpiredBookings = async () => {
   await connect();
 
   const now = new Date();
@@ -83,3 +87,5 @@ export const checkAndRemoveExpiredBookings = async () => {
     }
   }
 };
+
+export default startWebSocketServer;
