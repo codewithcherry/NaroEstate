@@ -5,16 +5,23 @@ import axios from "axios";
 import ListingCard from "@/components/react-components/listing/ListingCard";
 import { Loader2 } from "lucide-react";
 import ListingFilter from "@/components/react-components/listing/ListingFilter";
+import { useSearchParams, useRouter } from "next/navigation"; // Correct imports for App Router
 
 const ListingGrid = () => {
   const [listings, setListings] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const searchParams = useSearchParams(); // Get search params
+  const router = useRouter(); // Get router instance
+
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await axios.get("/api/listings");
+        // Fetch listings based on query parameters
+        console.log(searchParams.toString())
+        const query = new URLSearchParams(searchParams.toString());
+        const response = await axios.get(`/api/listings?${query.toString()}`);
         setListings(response.data.listings);
       } catch (err) {
         setError(new Error("Failed to fetch listings"));
@@ -24,7 +31,7 @@ const ListingGrid = () => {
     };
 
     fetchListings();
-  }, []);
+  }, [searchParams]); // Re-fetch listings when searchParams change
 
   if (loading)
     return (
@@ -55,14 +62,15 @@ const ListingGrid = () => {
 const Page = () => {
   return (
     <div className="container mx-auto py-6">
+      {/* ListingFilter does not need to be inside Suspense */}
+      <ListingFilter />
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
             <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
           </div>
         }
-      > 
-        <ListingFilter />
+      >
         <ListingGrid />
       </Suspense>
     </div>
