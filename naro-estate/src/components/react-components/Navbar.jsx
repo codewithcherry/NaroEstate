@@ -1,142 +1,178 @@
 'use client'
-import React, { useState } from 'react'
-import { Button } from '../ui/button'
-import * as Avatar from '@radix-ui/react-avatar'
-import Link from 'next/link'
-import { useAuth } from '@/context/AuthContext'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu'
-import { LogOut, User, Settings, House ,Search} from "lucide-react"
-import { useRouter } from 'next/navigation'
-import axios from 'axios'
-import { useToast } from '@/hooks/use-toast'
+import React, { useState, useEffect } from 'react';
+import { Button } from '../ui/button';
+import * as Avatar from '@radix-ui/react-avatar';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '../ui/dropdown-menu';
+import { LogOut, User, Settings, House, Search, Menu, X } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
+import { debounce } from 'lodash';
+
+// Constants for paths and labels
+const NAV_LINKS = [
+  { path: '/', label: 'Home' },
+  { path: '/listings', label: 'Listings' },
+  { path: '/about', label: 'About' },
+  { path: '/contact-us', label: 'Contact Us' },
+];
+
+const LOGGED_IN_LINKS = [
+  { path: '/my-listings', label: 'My Listings', icon: <House className="w-4 h-4 mr-2" /> },
+  { path: '/profile', label: 'Profile', icon: <User className="w-4 h-4 mr-2" /> },
+  { path: '/settings', label: 'Settings', icon: <Settings className="w-4 h-4 mr-2" /> },
+];
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [signoutLoading,setSignoutLoading]=useState(false);
+  const [signoutLoading, setSignoutLoading] = useState(false);
+  const [userData, setUserData] = useState({ username: '', imageUrl: '' });
   const router = useRouter();
+  const pathname = usePathname(); // Get current path
   const { isLoggedIn, signout } = useAuth();
+  const { toast } = useToast();
 
-  const {toast}=useToast();
+  // Fetch user data from localStorage on component mount
+  useEffect(() => {
+    if (isLoggedIn) {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      setUserData({
+        username: user.username || 'User',
+        imageUrl: user.imageUrl || '',
+      });
+    }
+  }, [isLoggedIn]);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = debounce((event) => {
     setSearchQuery(event.target.value);
-  };
+    // Add search logic here (e.g., API call)
+  }, 300);
 
-  const getPathName = (path) => {
-    if (path === '/') return 'Home';
-    return path
-      .replace('/', '')
-      .replace('-', ' ')
-      .replace(/^./, str => str.toUpperCase());
-  };
-
-  const handleSignout=async(e)=>{
+  const handleSignout = async (e) => {
     e.preventDefault();
-    console.log('handle signout method working')
     try {
       setSignoutLoading(true);
-      const response=await axios.post('/api/user/signout',{},{
-        headers:{
-          "Content-Type":"application/json"
-        }
-      })
-      console.log(response.data);
+      const response = await axios.post('/api/user/signout', {}, {
+        headers: { 'Content-Type': 'application/json' },
+      });
       toast({
-        title:response.data.type,
-        description:response.data.message,
-      })
+        title: response.data.type,
+        description: response.data.message,
+      });
       signout();
-      router.push('/')
-      
+      router.push('/');
     } catch (error) {
-      console.log("error occurred",error);
       toast({
-        title:error.response.data?.type,
-        description:error.response.data?.message
-      })
-    }
-    finally{
+        title: error.response.data?.type || 'Error',
+        description: error.response.data?.message || 'An error occurred',
+      });
+    } finally {
       setSignoutLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="bg-slate-200">
+    <div className="bg-slate-200 shadow-sm">
       <div className="flex items-center justify-between px-6 py-4 max-w-screen-xl mx-auto">
         {/* Logo */}
-        <div className="flex items-center hover:cursor-pointer" onClick={() => router.push('/')}>
+        <div
+          className="flex items-center hover:cursor-pointer"
+          onClick={() => router.push('/')}
+        >
           <span className="text-slate-500 text-2xl font-semibold">Naro</span>
           <span className="text-2xl text-slate-400 font-semibold">Estate</span>
         </div>
 
         {/* Search Bar (Desktop) */}
-        <div className="hidden sm:block">
-          <form>
+        <div className="hidden sm:block max-w-lg w-full mx-8">
+          <form onSubmit={(e) => e.preventDefault()} className="w-full">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search places..."
-                className="px-4 py-2 rounded-lg w-96 focus:ring-2 focus:ring-slate-500 focus:outline-none"
+                onChange={handleSearchChange}
+                className="px-4 py-2 pr-10 rounded-lg w-full focus:ring-2 focus:ring-slate-500 focus:outline-none"
               />
-              <Button
+              <button
                 type="submit"
-                className="absolute right-0 top-0 bottom-0 px-4 py-2 bg-white hover:bg-slate-50 rounded-r-lg"
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 hover:text-slate-700"
               >
-                <Search className="w-4 h-4 text-primary"/>
-              </Button>
+                <Search className="w-5 h-5" />
+              </button>
             </div>
           </form>
         </div>
 
-        {/* Navbar Links & Avatar */}
+        {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center space-x-6">
-          {['/', '/listings', '/about', '/contact-us'].map((path, index) => (
+          {NAV_LINKS.map((link) => (
             <Link
-              key={index}
-              href={path}
-              className="relative text-slate-600 hover:text-slate-900 transition-colors duration-300 before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-slate-900 before:transition-all before:duration-300 hover:before:w-full"
+              key={link.path}
+              href={link.path}
+              className={`text-slate-600 hover:text-slate-900 transition-colors duration-300 relative before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-slate-900 before:transition-all before:duration-300 hover:before:w-full ${
+                pathname === link.path ? 'before:w-full' : ''
+              }`}
             >
-              {getPathName(path)}
+              {link.label}
             </Link>
           ))}
-          
+
           {isLoggedIn ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar.Root className="relative inline-block w-10 h-10 rounded-full overflow-hidden hover:cursor-pointer">
-                  <Avatar.Image
-                    className="object-cover w-full h-full"
-                    src="https://randomuser.me/api/portraits/men/32.jpg"
-                    alt="User Avatar"
-                  />
-                  <Avatar.Fallback className="flex items-center justify-center bg-gray-300 text-white font-bold">
-                    UN
-                  </Avatar.Fallback>
-                </Avatar.Root>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/profile')}>
-                  <User className="w-4 h-4 mr-2" /> Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/my-listings')}>
-                  <House className="w-4 h-4 mr-2" /> My Listings
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/settings')}>
-                  <Settings className="w-4 h-4 mr-2" /> Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignout}>
-                  <LogOut className="w-4 h-4 mr-2" onClick={handleSignout}/> {signoutLoading?<span className='animate-pulse transition delay-75'>Signing out...</span>: <span>Signout</span>}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center space-x-2 hover:cursor-pointer">
+                    <Avatar.Root className="relative inline-block w-10 h-10 rounded-full overflow-hidden">
+                      <Avatar.Image
+                        className="object-cover w-full h-full"
+                        src={userData.imageUrl}
+                        alt="User Avatar"
+                      />
+                      <Avatar.Fallback className="flex items-center justify-center bg-gray-300 text-white font-bold">
+                        {userData.username.charAt(0).toUpperCase()}
+                      </Avatar.Fallback>
+                    </Avatar.Root>
+                    <span className="text-slate-600">{userData.username}</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {LOGGED_IN_LINKS.map((link) => (
+                    <DropdownMenuItem key={link.path} onClick={() => router.push(link.path)}>
+                      {link.icon}
+                      {link.label}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {signoutLoading ? (
+                      <span className="animate-pulse">Signing out...</span>
+                    ) : (
+                      'Sign out'
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
-            <Link href="/login" className="text-slate-600 hover:text-slate-900 transition duration-200" onClick={()=>router.push('/login')}> 
+            <Link
+              href="/login"
+              className="text-slate-600 hover:text-slate-900 transition duration-200"
+            >
               Sign in
             </Link>
           )}
@@ -144,82 +180,77 @@ const Navbar = () => {
 
         {/* Mobile Menu Toggle */}
         <div className="sm:hidden">
-          <Button variant="ghost" aria-label="Open mobile menu" onClick={toggleMobileMenu}>
-            ☰
+          <Button
+            variant="ghost"
+            aria-label="Toggle mobile menu"
+            onClick={toggleMobileMenu}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
         </div>
       </div>
 
-      {/* Mobile Search Bar */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="sm:hidden px-6 py-2 max-w-screen-xl mx-auto">
-          <form>
+        <div className="sm:hidden bg-slate-200 px-6 py-4">
+          <form onSubmit={(e) => e.preventDefault()} className="mb-4">
             <div className="relative">
               <input
                 type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
                 placeholder="Search places..."
-                className="px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-slate-500 focus:outline-none"
+                onChange={handleSearchChange}
+                className="px-4 py-2 pr-10 rounded-lg w-full focus:ring-2 focus:ring-slate-500 focus:outline-none"
               />
-              <Button
+              <button
                 type="submit"
-                className="absolute right-0 top-0 bottom-0 px-4 py-2 bg-white hover:bg-slate-50 rounded-r-lg"
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 hover:text-slate-700"
               >
-                <Search className="w-4 h-4 text-primary"/>
-              </Button>
+                <Search className="w-5 h-5" />
+              </button>
             </div>
           </form>
-        </div>
-      )}
 
-      {/* Mobile Menu Items */}
-      {isMobileMenuOpen && (
-        <div className="sm:hidden bg-slate-200 px-6 py-4 max-w-screen-xl mx-auto">
           <div className="flex flex-col space-y-4">
-            {isLoggedIn
-              ? [
-                  '/home',
-                  '/listings',
-                  '/settings',
-                  '/profile',
-                  '/my listings',
-                  '/about',
-                  '/contact-us',
-                ].map((path, index) => (
-                  <Link
-                    key={index}
-                    href={path}
-                    className="text-slate-600 hover:text-slate-900 transition duration-200"
-                  >
-                    {getPathName(path)}
-                  </Link>
-                ))
-              : [
-                  '/home',
-                  '/listings',
-                  '/settings',
-                  '/about',
-                  '/contact-us',
-                ].map((path, index) => (
-                  <Link
-                    key={index}
-                    href={path}
-                    className="text-slate-600 hover:text-slate-900 transition duration-200"
-                  >
-                    {getPathName(path)}
-                  </Link>
-                ))}
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.path}
+                href={link.path}
+                className={`text-slate-600 hover:text-slate-900 transition duration-200 relative before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-slate-900 before:transition-all before:duration-300 hover:before:w-full ${
+                  pathname === link.path ? 'before:w-full' : ''
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Logged-in User Links */}
+            {isLoggedIn &&
+              LOGGED_IN_LINKS.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={`text-slate-600 hover:text-slate-900 transition duration-200 relative before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-slate-900 before:transition-all before:duration-300 hover:before:w-full ${
+                    pathname === link.path ? 'before:w-full' : ''
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
           </div>
-          <div className="flex flex-col space-y-4 mt-4">
+
+          <div className="mt-4">
             {isLoggedIn ? (
-              <Button variant="outline" className="text-slate-600 hover:bg-slate-100" onClick={handleSignout}>
-                {signoutLoading?<span className='animate-pulse transition delay-75'>Signing out...</span>: <span>Signout</span>}
+              <Button
+                variant="outline"
+                className="w-full text-slate-600 hover:bg-slate-100"
+                onClick={handleSignout}
+              >
+                {signoutLoading ? 'Signing out...' : 'Sign out'}
               </Button>
             ) : (
-              <Link href="/login">
-                <Button variant="outline" className="text-slate-600 hover:bg-slate-100" onClick={()=>router.push('/login')}>
-                  Sign In
+              <Link href="/login" className="block">
+                <Button variant="outline" className="w-full text-slate-600 hover:bg-slate-100">
+                  Sign in
                 </Button>
               </Link>
             )}
