@@ -6,18 +6,17 @@ import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
 import { Loader2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 
 const Page = () => {
   const [myListings, setMyListings] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [token, setToken] = useState(null);  // State for auth token
+  const [token, setToken] = useState(null);
 
   const router = useRouter();
   const { toast } = useToast();
   const { isLoggedIn, loading } = useAuth();
 
-  // Set token from localStorage on the client side only
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
     if (storedToken) setToken(storedToken);
@@ -32,18 +31,11 @@ const Page = () => {
           'Content-Type': 'application/json',
         },
       });
-      const data = response.data;
-      setMyListings(data.listings);
-      toast({
-        title: data.type,
-        description: data.message,
-      });
+      setMyListings(response.data.listings);
     } catch (error) {
-      console.log(error);
       toast({
-        title: error?.response?.data?.type || 'error',
-        description:
-          error?.response?.data?.message || "Couldn't fetch the listings, try again",
+        title: 'Error',
+        description: 'Failed to fetch listings. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -51,43 +43,55 @@ const Page = () => {
     }
   };
 
-  const handleCreateNewListing = () => {
-    router.push('/create-listing');
-  };
-
   useEffect(() => {
     if (!isLoggedIn && !loading) {
-      toast({
-        title: 'error',
-        description: 'Login to your account to access My-Listings page',
-        variant: 'destructive',
-      });
       router.push('/login');
-    } else if (token) {  // Fetch listings only if token is available
+    } else if (token) {
       fetchMyListings();
     }
-  }, [isLoggedIn, loading, token]);  // Add token as a dependency
+  }, [isLoggedIn, loading, token]);
 
   return (
-    <div className='container mx-auto w-full h-screen bg-background'>
-      <Button onClick={handleCreateNewListing}>
-        <Plus /> New Listing
-      </Button>
-      {isFetching ? (
-        <Loader2 className='w-5 h-5 animate-spin text-gray-500' />
-      ) : (
-        <div>
-          {myListings.length > 0 ? (
-            myListings.map((listing, index) => (
-              <MyListingCard listing={listing} key={index} />
-            ))
-          ) : (
-            <p>No listings to show!</p>
-          )}
-        </div>
-      )}
+    <div className='container mx-auto p-6 bg-background min-h-screen'>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-2xl font-bold text-gray-800'>My Listings</h1>
+        <Button onClick={() => router.push('/create-listing')} className='flex items-center gap-2'>
+          <Plus className='w-4 h-4 test-primary' /> New Listing
+        </Button>
+      </div>
+
+      <Suspense fallback={<LoadingSkeleton />}>
+        {isFetching ? (
+          <Loader2 className='w-8 h-8 animate-spin text-gray-500 mx-auto mt-10' />
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {myListings.length > 0 ? (
+              myListings.map((listing, index) => (
+                <MyListingCard listing={listing} key={index} />
+              ))
+            ) : (
+              <p className='text-gray-500 text-center col-span-full'>No listings to show!</p>
+            )}
+          </div>
+        )}
+      </Suspense>
     </div>
   );
 };
+
+const LoadingSkeleton = () => (
+  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    {Array.from({ length: 6 }).map((_, index) => (
+      <div key={index} className='bg-white p-4 rounded-lg shadow-md animate-pulse'>
+        <div className='h-48 bg-gray-200 rounded-md'></div>
+        <div className='mt-4 space-y-2'>
+          <div className='h-4 bg-gray-200 rounded'></div>
+          <div className='h-4 bg-gray-200 rounded w-3/4'></div>
+          <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 export default Page;
