@@ -5,7 +5,8 @@ import axios from "axios";
 import ListingCard from "@/components/react-components/listing/ListingCard";
 import { Loader2 } from "lucide-react";
 import ListingFilter from "@/components/react-components/listing/ListingFilter";
-import { useSearchParams, useRouter } from "next/navigation"; // Correct imports for App Router
+import { useRouter } from 'next/compat/router';
+import { useSearchParams } from 'next/navigation';
 
 const ListingGrid = () => {
   const [listings, setListings] = useState(null);
@@ -63,14 +64,14 @@ const Page = () => {
   return (
     <div className="container mx-auto py-6">
       {/* ListingFilter does not need to be inside Suspense */}
-      <ListingFilter />
+      
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
             <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
           </div>
         }
-      >
+      ><ListingFilter />
         <ListingGrid />
       </Suspense>
     </div>
