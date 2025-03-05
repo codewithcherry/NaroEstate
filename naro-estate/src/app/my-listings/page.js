@@ -32,7 +32,7 @@ const fetchMyListings=async()=>{
     setMyListings(data.listings);
     toast({
       title:data.type,
-      description:data.type.message
+      description:data.message
     })
 
   } catch (error) {
