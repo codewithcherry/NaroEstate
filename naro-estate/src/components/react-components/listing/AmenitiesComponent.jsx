@@ -2,21 +2,78 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wind, Utensils, Bath, Tv, Leaf, Shield, Accessibility, Dog, Dumbbell } from "lucide-react";
+import {
+  FaWind, FaUtensils, FaBath, FaTv, FaLeaf, FaShieldAlt, FaWheelchair, FaDog, FaDumbbell,
+  FaThermometerHalf, FaWifi, FaParking, FaTint, FaTv as FaTv2, FaBook, FaGamepad, FaMusic,
+  FaHome, FaTree, FaSwimmingPool, FaCamera, FaLock, FaSmoking, FaSmokingBan, FaArrowUp,
+  FaMountain, FaBone, FaSpa, FaFireAlt, FaBaby, FaBed, FaUtensils as FaBowlIcon
+} from "react-icons/fa"; // Using Font Awesome icons from React Icons
 
 export default function AmenitiesComponent({ amenities = {} }) {
   const [open, setOpen] = useState(false);
 
   const categoryIcons = {
-    basic: <Wind size={20} />, 
-    kitchen: <Utensils size={20} />, 
-    bathroom: <Bath size={20} />, 
-    entertainment: <Tv size={20} />, 
-    outdoor: <Leaf size={20} />, 
-    security: <Shield size={20} />, 
-    accessibility: <Accessibility size={20} />, 
-    pet: <Dog size={20} />, 
-    additional: <Dumbbell size={20} />
+    basic: <FaWind size={20} />,
+    kitchen: <FaUtensils size={20} />,
+    bathroom: <FaBath size={20} />,
+    entertainment: <FaTv size={20} />,
+    outdoor: <FaLeaf size={20} />,
+    security: <FaShieldAlt size={20} />,
+    accessibility: <FaWheelchair size={20} />,
+    pet: <FaDog size={20} />,
+    additional: <FaDumbbell size={20} />
+  };
+
+  const amenityIcons = {
+    airConditioning: <FaThermometerHalf size={20} />,
+    heating: <FaThermometerHalf size={20} />,
+    wifi: <FaWifi size={20} />,
+    parking: <FaParking size={20} />,
+    hotWater: <FaTint size={20} />,
+    fullyEquippedKitchen: <FaUtensils size={20} />,
+    microwave: <FaHome size={20} />,
+    refrigerator: <FaHome size={20} />,
+    dishwasher: <FaHome size={20} />,
+    coffeeMaker: <FaHome size={20} />,
+    oven: <FaHome size={20} />,
+    toaster: <FaHome size={20} />,
+    stove: <FaHome size={20} />,
+    cookingUtensils: <FaUtensils size={20} />,
+    bathtub: <FaBath size={20} />,
+    shower: <FaBath size={20} />,
+    toiletries: <FaBath size={20} />,
+    hairDryer: <FaBath size={20} />,
+    towels: <FaBath size={20} />,
+    washingMachine: <FaBath size={20} />,
+    cableTV: <FaTv2 size={20} />,
+    streamingServices: <FaTv2 size={20} />,
+    booksAndMagazines: <FaBook size={20} />,
+    boardGames: <FaGamepad size={20} />,
+    musicSystem: <FaMusic size={20} />,
+    balconyPatio: <FaHome size={20} />,
+    privateGarden: <FaTree size={20} />,
+    bbqGrill: <FaHome size={20} />, // Placeholder for BBQ Grill
+    outdoorDiningArea: <FaHome size={20} />, // Placeholder for Outdoor Dining
+    swimmingPool: <FaSwimmingPool size={20} />,
+    hotTub: <FaSwimmingPool size={20} />, // Placeholder for Hot Tub
+    securityCameras: <FaCamera size={20} />,
+    gatedProperty: <FaLock size={20} />,
+    alarmSystem: <FaSmoking size={20} />, // Placeholder for Alarm System
+    safe: <FaLock size={20} />, // Placeholder for Safe
+    smokeDetectors: <FaSmokingBan size={20} />,
+    carbonMonoxideDetectors: <FaSmokingBan size={20} />,
+    elevator: <FaArrowUp size={20} />,
+    wheelchairAccessible: <FaWheelchair size={20} />,
+    rampAccess: <FaMountain size={20} />, // Placeholder for Ramp Access
+    petFriendly: <FaBone size={20} />,
+    petBowls: <FaBowlIcon size={20} />, // Using Utensils as a placeholder for Pet Bowls
+    fencedYard: <FaHome size={20} />, // Replaced FaFence with FaHome as a placeholder
+    gym: <FaDumbbell size={20} />,
+    spa: <FaSpa size={20} />,
+    fireplace: <FaFireAlt size={20} />,
+    washerDryer: <FaHome size={20} />, // Placeholder for Washer/Dryer
+    highChairs: <FaBaby size={20} />,
+    crib: <FaBed size={20} />
   };
 
   return (
@@ -26,11 +83,14 @@ export default function AmenitiesComponent({ amenities = {} }) {
 
         {/* Basic Amenities */}
         <div className="grid grid-cols-2 gap-4 mt-2">
-          <p>{amenities?.basic?.airConditioning ?? false ? "✔ Air Conditioning" : "✖ Air Conditioning"}</p>
-          <p>{amenities?.basic?.heating ?? false ? "✔ Heating" : "✖ Heating"}</p>
-          <p>{amenities?.basic?.wifi ?? false ? "✔ WiFi" : "✖ WiFi"}</p>
-          <p>{amenities?.basic?.parking ?? false ? "✔ Parking" : "✖ Parking"}</p>
-          <p>{amenities?.basic?.hotWater ?? false ? "✔ Hot Water" : "✖ Hot Water"}</p>
+          {Object.entries(amenities?.basic || {}).map(([amenity, available]) => (
+            <div key={amenity} className="flex items-center space-x-2">
+              {amenityIcons[amenity]}
+              <p className={available ? "" : "line-through"}>
+                {amenity.replace(/([A-Z])/g, ' $1').trim()}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* Show More Button & Dialog */}
@@ -50,7 +110,12 @@ export default function AmenitiesComponent({ amenities = {} }) {
                   </h3>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     {Object.entries(items || {}).map(([amenity, available]) => (
-                      <p key={amenity}>{available ? `✔ ${amenity.replace(/([A-Z])/g, ' $1').trim()}` : `✖ ${amenity.replace(/([A-Z])/g, ' $1').trim()}`}</p>
+                      <div key={amenity} className="flex items-center space-x-2">
+                        {amenityIcons[amenity]}
+                        <p className={available ? "" : "line-through"}>
+                          {amenity.replace(/([A-Z])/g, ' $1').trim()}
+                        </p>
+                      </div>
                     ))}
                   </div>
                 </div>
