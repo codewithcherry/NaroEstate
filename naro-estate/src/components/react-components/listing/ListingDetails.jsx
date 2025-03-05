@@ -1,15 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Bath, Bed, Home, Layout, Tag, DollarSign, Lock, Utensils, ParkingCircle, Ruler, Loader2 } from "lucide-react";
+import { Bath, Bed, Home, Layout, Tag, DollarSign, Lock, Utensils, ParkingCircle, Ruler, Loader2, MapPin, Calendar, Star } from "lucide-react";
 
 const ListingDetails = ({ listing }) => {
-  if (!listing) return <Loader2 className="w-8 h-8 animate-spin text-gray-500 "/>; // Handle undefined listing
+  if (!listing) return <Loader2 className="w-8 h-8 animate-spin text-gray-500" />; // Handle undefined listing
 
   return (
     <Card className="container mx-auto p-6 rounded-xl shadow-lg mt-6">
       <CardContent className="space-y-4">
+        {/* Property Details */}
         <h2 className="text-lg font-semibold">Property Details</h2>
-
-        <div className="grid grid-cols-2 gap-4 mt-2">
+        <div className="grid  grid-cols-2 md:grid-cols-4 gap-4 mt-2">
           <p className="flex items-center gap-2"><Home size={20} /> {listing.propertyType ?? "N/A"}</p>
           <p className="flex items-center gap-2"><Tag size={20} /> {listing.propertyStatus ?? "N/A"}</p>
           <p className="flex items-center gap-2"><Lock size={20} /> {listing.listingType ?? "N/A"}</p>
@@ -28,8 +28,27 @@ const ListingDetails = ({ listing }) => {
           )}
         </div>
 
+        {/* Address */}
+        <h3 className="text-lg font-semibold mt-4">Address</h3>
+        <div className="flex items-center gap-2">
+          <MapPin size={20} />
+          <p>
+            {listing.address?.doorNumber}, {listing.address?.streetOrLocality}, {listing.address?.city}, {listing.address?.state}, {listing.address?.zipCode}
+          </p>
+        </div>
+
+        {/* Title and Description */}
         <h3 className="text-lg font-semibold mt-4">{listing.title ?? "No Title"}</h3>
         <p className="text-gray-600">{listing.description ?? "No description available."}</p>
+
+        
+
+        {/* Additional Details */}
+        <h3 className="text-lg font-semibold mt-4">Additional Details</h3>
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <p className="flex items-center gap-2"><Calendar size={20} /> Listed on: {new Date(listing.createdAt).toLocaleDateString()}</p>
+          
+        </div>
       </CardContent>
     </Card>
   );

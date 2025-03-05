@@ -38,7 +38,9 @@ export default function RoomListing({ listing }) {
           <div className="flex items-center gap-1">
             <MapPin className="w-4 h-4 text-blue-500" />
             <p className="text-gray-600">
-              {listing.address?.doorNumber ?? "N/A"}, {listing.address?.city ?? "Unknown"}, {listing.address?.state ?? "Unknown"}
+            <p>
+            {listing.address?.doorNumber}, {listing.address?.streetOrLocality}, {listing.address?.city}, {listing.address?.state}, {listing.address?.zipCode}
+          </p>
             </p>
           </div>
         </div>
@@ -99,12 +101,9 @@ export default function RoomListing({ listing }) {
                 <DialogTitle>About this place</DialogTitle>
               </DialogHeader>
               <p className="text-gray-700 text-sm mt-1">
-                As your host, I will make sure you feel very welcome here! There is plenty of shared space in my apartment - kitchen, large bathroom, large living room, and a terrace.
+                {listing.description}
               </p>
-              <h3 className="text-md font-semibold mt-2">The space</h3>
-              <p className="text-gray-700 text-sm">
-                A lovely private room with a comfortable bed. The apartment is modern and very clean, as noted by previous guest reviews.
-              </p>
+              
             </DialogContent>
           </Dialog>
         </div>
