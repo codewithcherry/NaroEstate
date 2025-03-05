@@ -30,17 +30,17 @@ const ListingFilter = () => {
     rent: false,
     stay: false,
     lease: false,
-    townHouse: false,
-    modernVilla: false,
     apartment: false,
-    singleFamily: false,
+    townhouse: false,
+    modern_villa: false,
+    single_family: false,
     office: false,
     commercial: false,
     petFriendly: false,
     petCare: false,
-    beds: 1,
-    baths: 1,
-    priceRange: [0, 5000], // Default price range
+    beds: 0,
+    baths: 0,
+    // priceRange: [0, 5000], // Default price range
     city: "",
     state: "",
   });
@@ -61,17 +61,17 @@ const ListingFilter = () => {
       rent: false,
       stay: false,
       lease: false,
-      townHouse: false,
-      modernVilla: false,
       apartment: false,
-      singleFamily: false,
+      townhouse: false,
+      modern_villa: false,
+      single_family: false,
       office: false,
       commercial: false,
       petFriendly: false,
       petCare: false,
-      beds: 1,
-      baths: 1,
-      priceRange: [0, 5000],
+      beds: 0,
+      baths: 0,
+    //   priceRange: [0, 5000],
       city: "",
       state: "",
     });
@@ -102,10 +102,10 @@ const ListingFilter = () => {
 
     // Add property type filters as a comma-separated list
     const selectedPropertyTypes = [];
-    if (filters.townHouse) selectedPropertyTypes.push("townHouse");
-    if (filters.modernVilla) selectedPropertyTypes.push("modernVilla");
+    if (filters.townhouse) selectedPropertyTypes.push("townhouse");
+    if (filters.modern_villa) selectedPropertyTypes.push("modern_villa");
     if (filters.apartment) selectedPropertyTypes.push("apartment");
-    if (filters.singleFamily) selectedPropertyTypes.push("singleFamily");
+    if (filters.single_family) selectedPropertyTypes.push("single_family");
     if (filters.office) selectedPropertyTypes.push("office");
     if (filters.commercial) selectedPropertyTypes.push("commercial");
 
@@ -125,10 +125,10 @@ const ListingFilter = () => {
     // Add numeric filters
     if (filters.beds > 0) queryParams.append("beds", filters.beds);
     if (filters.baths > 0) queryParams.append("baths", filters.baths);
-    if (filters.priceRange[0])
-      queryParams.append("minPrice", filters.priceRange[0]);
-    if (filters.priceRange[1])
-      queryParams.append("maxPrice", filters.priceRange[1]);
+    // if (filters.priceRange[0])
+    //   queryParams.append("minPrice", filters.priceRange[0]);
+    // if (filters.priceRange[1])
+    //   queryParams.append("maxPrice", filters.priceRange[1]);
 
     // Add location filters
     if (filters.city) queryParams.append("city", filters.city);
@@ -183,6 +183,7 @@ const ListingFilter = () => {
           aria-label="Open filters"
         >
           <Filter className="w-5 h-5" />
+          Filter
         </Button>
       </div>
 
@@ -224,18 +225,18 @@ const ListingFilter = () => {
             <h3 className="font-semibold">Property Type</h3>
             {renderCheckboxes(
               [
-                'townHouse',
-                'modernVilla',
-                'apartment',
-                'singleFamily',
-                'office',
-                'commercial',
+                "apartment",
+                "townhouse",
+                "modern_villa",
+                "single_family",
+                "office",
+                "commercial",
               ],
               "Property Type"
             )}
 
             {/* Price Range */}
-            <h3 className="font-semibold">Price Range</h3>
+            {/* <h3 className="font-semibold">Price Range</h3>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
                 ${filters.priceRange[0]}
@@ -254,7 +255,7 @@ const ListingFilter = () => {
               <span className="text-sm text-gray-600">
                 ${filters.priceRange[1]}
               </span>
-            </div>
+            </div> */}
 
             {/* Beds, Baths, City, State */}
             <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
@@ -268,7 +269,7 @@ const ListingFilter = () => {
                   onChange={(e) =>
                     setFilters({
                       ...filters,
-                      beds: parseInt(e.target.value) || 1,
+                      beds: parseInt(e.target.value) || 0,
                     })
                   }
                   aria-label="Number of beds"
@@ -284,7 +285,7 @@ const ListingFilter = () => {
                   onChange={(e) =>
                     setFilters({
                       ...filters,
-                      baths: parseInt(e.target.value) || 1,
+                      baths: parseInt(e.target.value) || 0,
                     })
                   }
                   aria-label="Number of baths"
