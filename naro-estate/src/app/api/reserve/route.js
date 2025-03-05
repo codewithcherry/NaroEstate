@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 export const POST = async (request) => {
   try {
     const reqBody = await request.json();
-    const { listingId, checkIn, checkOut } = reqBody;
+    const { listingId, checkIn, checkOut,stayPrice } = reqBody;
     const userId = request.headers.get("userId");
 
     if (!listingId || !checkIn || !checkOut || !userId) {
