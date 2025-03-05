@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,6 +45,8 @@ const ListingFilter = () => {
     state: "",
   });
 
+  const [activeButton, setActiveButton] = useState("All");
+
   const router = useRouter(); // Get router instance
   const searchParams = useSearchParams(); // Get search params
 
@@ -71,7 +73,7 @@ const ListingFilter = () => {
       petCare: false,
       beds: 0,
       baths: 0,
-    //   priceRange: [0, 5000],
+      //   priceRange: [0, 5000],
       city: "",
       state: "",
     });
@@ -138,6 +140,15 @@ const ListingFilter = () => {
     router.push(`/listings?${queryParams.toString()}`);
   }, [filters, router]);
 
+  const hanldeNavButton=(type)=>{
+    const queryParams = new URLSearchParams();
+    if (type) {
+        queryParams.append("listingType", type.toLowerCase());
+        setActiveButton(type)    
+        router.push(`/listings?${queryParams.toString()}`);
+    }
+  }
+
   // Icons for filter types
   const icons = {
     All: <Home className="w-5 h-5" />,
@@ -168,12 +179,27 @@ const ListingFilter = () => {
     </div>
   );
 
+  useEffect(()=>{
+    const listingType = searchParams.get('listingType') || "All";
+    setActiveButton(listingType.charAt(0).toUpperCase() + listingType.slice(1));
+  },[])
+
   return (
     <div>
       {/* Desktop Filter Buttons */}
       <div className="hidden md:flex justify-center space-x-4 mb-4">
         {["All", "Sale", "Rent", "Stay", "Lease"].map((type) => (
-          <Button key={type} variant="ghost" aria-label={`Filter by ${type}`}>
+          <Button
+            key={type}
+            variant="ghost"
+            className={
+              activeButton === type
+                ? "border-b-2 border-blue-500 text-blue-500 rounded-none hover:bg-blue-50 hover:text-blue-600"
+                : ""
+            }
+            aria-label={`Filter by ${type}`}
+            onClick={() => hanldeNavButton(type)} // Update the activeButton state on click
+          >
             {icons[type]} {type}
           </Button>
         ))}
@@ -188,24 +214,31 @@ const ListingFilter = () => {
       </div>
 
       {/* Mobile Filter Buttons */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg flex justify-around items-center px-4 py-2 z-50 border-t">
-        {["All", "Sale", "Rent", "Stay", "Lease", "Filter"].map((type) => (
-          <Button
-            key={type}
-            variant="ghost"
-            onClick={
-              type === "Filter" ? () => setIsDialogOpen(true) : undefined
-            }
-            className="flex flex-col items-center text-xs text-gray-700 hover:text-black space-y-1"
-            aria-label={
-              type === "Filter" ? "Open filters" : `Filter by ${type}`
-            }
-          >
-            {type === "Filter" ? <Filter className="w-5 h-5" /> : icons[type]}
-            <span>{type}</span>
-          </Button>
-        ))}
-      </div>
+      {/* Mobile Filter Buttons */}
+<div className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg flex justify-around items-center px-4 py-2 z-50 border-t">
+  {["All", "Sale", "Rent", "Stay", "Lease", "Filter"].map((type) => (
+    <Button
+      key={type}
+      variant="ghost"
+      onClick={
+        type === "Filter"
+          ? () => setIsDialogOpen(true) // Open filter dialog for "Filter" button
+          : () => hanldeNavButton(type) // Set active button for other buttons
+      }
+      className={`flex flex-col items-center text-xs ${
+        activeButton === type && type !== "Filter" // Highlight only if active and not "Filter"
+          ? "text-blue-500"
+          : "text-gray-700 hover:text-black"
+      } space-y-1`}
+      aria-label={
+        type === "Filter" ? "Open filters" : `Filter by ${type}`
+      }
+    >
+      {type === "Filter" ? <Filter className="w-5 h-5" /> : icons[type]}
+      <span>{type}</span>
+    </Button>
+  ))}
+</div>
 
       {/* Filter Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

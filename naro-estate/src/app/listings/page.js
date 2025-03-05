@@ -45,7 +45,7 @@ const ListingGrid = () => {
 
   return (
     <div className="container mx-auto ">
-      <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 justify-items-center">
+      <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 justify-items-center">
         {listings && listings.length > 0 ? (
           listings.map((listing) => (
             <ListingCard key={listing._id} listing={listing} />
