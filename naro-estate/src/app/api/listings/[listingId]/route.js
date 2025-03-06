@@ -7,8 +7,10 @@ export const GET = async (request, { params }) => {
     try {
         await connect();
 
-        const listingId = params.listingId;
+        // Access the dynamic route parameter directly
+        const { listingId } = await params;
 
+        // Validate listingId
         if (!listingId) {
             return NextResponse.json(
                 {
@@ -19,8 +21,10 @@ export const GET = async (request, { params }) => {
             );
         }
 
+        // Fetch the listing and populate the createdBy field (excluding the password)
         const listingData = await Listing.findById(listingId).populate("createdBy", "-password");
 
+        // Handle case where listing is not found
         if (!listingData) {
             return NextResponse.json(
                 {
@@ -31,6 +35,7 @@ export const GET = async (request, { params }) => {
             );
         }
 
+        // Return the listing data
         return NextResponse.json(listingData, { status: 200 });
     } catch (error) {
         console.log(error);
