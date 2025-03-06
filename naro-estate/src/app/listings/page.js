@@ -14,6 +14,8 @@ const ListingGrid = ({ setPagination }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
+  const router=useRouter();
   const searchParams = useSearchParams(); // Get search params
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const ListingGrid = ({ setPagination }) => {
     };
 
     fetchListings();
-  }, [searchParams]); // Re-fetch listings when searchParams change
+  }, [searchParams,router]); // Re-fetch listings when searchParams change
 
   if (loading)
     return (

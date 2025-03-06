@@ -16,7 +16,7 @@ export const GET = async (request) => {
         const state = searchParams.get('state');
         const page = parseInt(searchParams.get('page')) || 1;
 
-        const listingsPerPage = 9;
+        const listingsPerPage = 6;
         const skip = (page - 1) * listingsPerPage;
 
         // Build the MongoDB query based on the extracted parameters
