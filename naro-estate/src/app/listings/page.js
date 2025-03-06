@@ -37,8 +37,10 @@ const ListingGrid = ({ pagination, setPagination }) => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
+      <div className="container mx-auto">
+        <div className="flex justify-center items-center h-80">
+          <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
+        </div>
       </div>
     );
 
