@@ -14,6 +14,10 @@ export const GET = async (request) => {
         const baths = searchParams.get('baths');
         const city = searchParams.get('city');
         const state = searchParams.get('state');
+        const page = parseInt(searchParams.get('page')) || 1;
+
+        const listingsPerPage = 9;
+        const skip = (page - 1) * listingsPerPage;
 
         // Build the MongoDB query based on the extracted parameters
         const query = {};
@@ -52,13 +56,26 @@ export const GET = async (request) => {
         console.log("Constructed Query:", JSON.stringify(query, null, 2));
 
         // Fetch listings based on the constructed query
-        const listings = await Listing.find(query).limit(9);
+        const totalListings = await Listing.countDocuments(query);
+        const listings = await Listing.find(query).skip(skip).limit(listingsPerPage);
+
+        const totalPages = Math.ceil(totalListings / listingsPerPage);
+
+        const pagination = {
+            totalPages: totalPages,
+            currentPage: page,
+            prevPage: page > 1 ? page - 1 : null,
+            nextPage: page < totalPages ? page + 1 : null,
+            hasPrevPage: page > 1,
+            hasNextPage: page < totalPages,
+        };
 
         return NextResponse.json(
             {
                 type: 'success',
                 message: 'Successfully fetched the listings!',
-                listings
+                listings,
+                pagination
             },
             { status: 200 }
         );
