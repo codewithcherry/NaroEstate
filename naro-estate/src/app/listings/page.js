@@ -9,23 +9,22 @@ import { useRouter } from 'next/compat/router';
 import { useSearchParams } from 'next/navigation';
 import ListingsPagination from "@/components/react-components/listing/ListingsPagination";
 
-const ListingGrid = ({ setPagination }) => {
-  const [listings, setListings] = useState([]);
+const ListingGrid = ({ pagination, setPagination }) => {
+  const [listings, setListings] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
-  const router=useRouter();
   const searchParams = useSearchParams(); // Get search params
+  const router = useRouter(); // Get router instance
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        // Fetch listings based on query parameters
+        console.log(searchParams.toString());
         const query = new URLSearchParams(searchParams.toString());
         const response = await axios.get(`/api/listings?${query.toString()}`);
         setListings(response.data.listings);
-        setPagination(response.data.pagination); // Update pagination in the parent component
+        setPagination(response.data.pagination);  // Update pagination state
       } catch (err) {
         setError(new Error("Failed to fetch listings"));
       } finally {
@@ -34,7 +33,7 @@ const ListingGrid = ({ setPagination }) => {
     };
 
     fetchListings();
-  }, [searchParams,router]); // Re-fetch listings when searchParams change
+  }, [searchParams, setPagination]); // Include setPagination in dependencies
 
   if (loading)
     return (
@@ -43,10 +42,10 @@ const ListingGrid = ({ setPagination }) => {
       </div>
     );
 
-  if (error) throw error; // This will trigger the `error.js` page in Next.js
+  if (error) throw error; // Trigger error page
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto ">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 justify-items-center">
         {listings && listings.length > 0 ? (
           listings.map((listing) => (
@@ -63,18 +62,10 @@ const ListingGrid = ({ setPagination }) => {
 };
 
 const Page = () => {
-  const [pagination, setPagination] = useState({
-    totalPages: 1,
-    currentPage: 1,
-    hasPrevPage: false,
-    hasNextPage: false,
-  });
+  const [pagination, setPagination] = useState({}); // Moved pagination state here
 
   return (
     <div className="container mx-auto py-6">
-      {/* ListingFilter does not need to be inside Suspense */}
-      <ListingFilter />
-
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
@@ -82,7 +73,8 @@ const Page = () => {
           </div>
         }
       >
-        <ListingGrid setPagination={setPagination} />
+        <ListingFilter />
+        <ListingGrid pagination={pagination} setPagination={setPagination} /> {/* Pass pagination as prop */}
         <div className="my-4">
         <ListingsPagination
           totalPages={pagination.totalPages}
