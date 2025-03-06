@@ -1,4 +1,5 @@
-import { useState } from "react";
+'use client';
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,11 +25,17 @@ const RequestAgentCall = ({ listingId }) => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
 
   const { isLoggedIn } = useAuth();
   const { toast } = useToast();
 
-  const token=localStorage.getItem('authToken');
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const authToken = localStorage.getItem('authToken');
+      setToken(authToken);
+    }
+  }, []);
 
   // Disable submission if user is not logged in
   const isSubmitDisabled = !isLoggedIn;
