@@ -26,7 +26,8 @@ const privatePaths = [
   "/api/rent-enquiry",
   "/api/sale-enquiry",
   "/api/reserve",
-  "/api/user/mylistings"
+  "/api/user/mylistings",
+  "/api/user/update-listing"
 ];
 
 const isPublicPath = (pathname) => publicPaths.includes(pathname);

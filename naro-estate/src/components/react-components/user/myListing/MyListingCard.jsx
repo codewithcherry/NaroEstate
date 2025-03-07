@@ -18,7 +18,7 @@ const MyListingCard = ({ listing }) => {
   const { toast } = useToast();
 
   const handleEdit = () => {
-    router.push(`/edit-listing/${listing._id.$oid}`);
+    router.push(`/update-listing?listingId=${listing._id}`);
   };
 
   const handleCardClick=(id)=>{
@@ -27,7 +27,7 @@ const MyListingCard = ({ listing }) => {
 
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(`/api/user/mylistings/${listing._id.$oid}`);
+      const response = await axios.delete(`/api/user/mylistings/${listing._id}`);
       toast({
         title: response.data.type,
         description: response.data.message,
@@ -44,8 +44,7 @@ const MyListingCard = ({ listing }) => {
   };
 
   return (
-    <div 
-      onClick={()=>{handleCardClick(listing._id)}}
+    <div     
     className='relative bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] hover:cursor-pointer'>
       {/* Cover Photo */}
       <div className='w-full h-48 overflow-hidden'>
