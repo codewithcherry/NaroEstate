@@ -1,14 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/compat/router';
 import { useSearchParams } from 'next/navigation';
 import EditListingForm from '@/components/react-components/listing/EditListingForm';
 import { Loader2, PencilIcon } from 'lucide-react';
 
-
-
-const Page = () => {
+const PageContent = () => {
   const [listingLoading, setListingLoading] = useState(false);
   const [listing, setListing] = useState({});
   const [error, setError] = useState(null);
@@ -49,7 +47,7 @@ const Page = () => {
     } else {
       console.warn('Missing listingId in URL!');
     }
-  }, [router,searchParams]);
+  }, [router, searchParams]);
 
   if (error) {
     return (
@@ -74,6 +72,14 @@ const Page = () => {
         <EditListingForm listing={listing} />
       )}
     </div>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
+    </Suspense>
   );
 };
 
