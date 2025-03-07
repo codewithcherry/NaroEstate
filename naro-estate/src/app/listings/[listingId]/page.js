@@ -14,6 +14,7 @@ import ReviewSection from "@/components/react-components/listing/ReviewSection";
 import BookListing from "@/components/react-components/listing/BookListing";
 import RentEnquiry from "@/components/react-components/listing/RentEnquiry";
 import RequestAgentCall from "@/components/react-components/listing/RequestAgentCall";
+import ShareDialog from "@/components/react-components/listing/ShareDialog";
 
 const Page = () => {
   const { listingId } = useParams();
@@ -69,7 +70,10 @@ const Page = () => {
         </div>
       ) : (
         <div className="container mx-auto">
-          <h1 className=" px-6 mt-4 text-3xl font-bold">{listing.title}</h1>
+          <div className="flex items-center justify-between px-6 mt-4 ">
+          <h1 className="text-3xl font-bold">{listing.title}</h1>
+          <ShareDialog />
+          </div>
           {/* <ViewListing listing={listing} /> */}
           <ListingMedia
             coverPhoto={listing.coverPhoto}
