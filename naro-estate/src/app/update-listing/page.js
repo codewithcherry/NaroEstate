@@ -1,16 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation'; // Updated import for Next.js 13+
+import { useRouter } from 'next/compat/router';
 import { useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import EditListingForm from '@/components/react-components/listing/EditListingForm';
 import { Loader2, PencilIcon } from 'lucide-react';
 
-// Dynamically import the EditListingForm component with SSR disabled
-const EditListingForm = dynamic(
-  () => import('@/components/react-components/listing/EditListingForm'),
-  { ssr: false }
-);
+
 
 const Page = () => {
   const [listingLoading, setListingLoading] = useState(false);
@@ -53,7 +49,7 @@ const Page = () => {
     } else {
       console.warn('Missing listingId in URL!');
     }
-  }, [searchParams]);
+  }, [router,searchParams]);
 
   if (error) {
     return (
