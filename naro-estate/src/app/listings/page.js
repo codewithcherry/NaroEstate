@@ -47,7 +47,7 @@ const ListingGrid = ({ pagination, setPagination }) => {
   if (error) throw error; // Trigger error page
 
   return (
-    <div className="container mx-auto ">
+    <div className="container mx-auto mt-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 justify-items-center">
         {listings && listings.length > 0 ? (
           listings.map((listing) => (
@@ -67,7 +67,7 @@ const Page = () => {
   const [pagination, setPagination] = useState({}); // Moved pagination state here
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="h-screen mt-4">
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
