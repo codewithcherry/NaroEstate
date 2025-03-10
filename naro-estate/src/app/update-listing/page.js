@@ -67,7 +67,7 @@ const PageContent = () => {
         <h1 className="text-2xl font-medium text-primary">Edit Listing</h1>
       </div>
       {listingLoading ? (
-        <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />
+        <div className='container mx-auto h-screen w-full '><Loader2 className="w-6 h-6 text-gray-500 animate-spin" /></div>
       ) : (
         <EditListingForm listing={listing} />
       )}
@@ -77,7 +77,7 @@ const PageContent = () => {
 
 const Page = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className='container mx-auto h-screen w-full '><Loader2 className="w-6 h-6 text-gray-500 animate-spin" /></div>}>
       <PageContent />
     </Suspense>
   );
