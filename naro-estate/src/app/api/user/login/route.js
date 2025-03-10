@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import User from "@/lib/models/user.model";
 import connect from "@/lib/mongoDb/database";
 import jwt from "jsonwebtoken";
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 const connectDB = async () => {
   try {
@@ -22,7 +22,10 @@ export const POST = async (request) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ type: "error", message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { type: "error", message: "User not found" },
+        { status: 404 }
+      );
     }
 
     // Validate password
@@ -34,7 +37,7 @@ export const POST = async (request) => {
       );
     }
 
-    // Generate JWT token
+    // Generate JWT tokens
     const payload = {
       username: user.username,
       id: user._id,
@@ -42,32 +45,48 @@ export const POST = async (request) => {
       imageUrl: user.imageUrl,
     };
 
-    const token = jwt.sign(payload, process.env.JWTOKEN_SECRET, { expiresIn: "1h" });
+    // Access Token (10 mins)
+    const accessToken = jwt.sign(payload, process.env.JWTOKEN_SECRET, {
+      expiresIn: "10m",
+    });
+
+    // Refresh Token (3 days)
+    const refreshToken = jwt.sign(payload, process.env.JWTOKEN_SECRET, {
+      expiresIn: "3d",
+    });
 
     // Create response
     const response = NextResponse.json({
       type: "success",
       message: "Login successful",
-      token:token,
-      user:{
+      token:accessToken,
+      user: {
         username: user.username,
         id: user._id,
         email: user.email,
         imageUrl: user.imageUrl,
-        role:user.role
-      }
+        role: user.role,
+      },
     });
 
-    // ✅ Correct way to set the cookie in NextResponse
-    response.cookies.set("authToken", token, {
+    // Set cookies
+    response.cookies.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
       sameSite: "strict",
-      maxAge: 3600, // 1 hour in seconds
+      maxAge: 600, // 10 mins in seconds
     });
 
-    return response; // ✅ Ensure modified response is returned
+    response.cookies.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 3, // 3 days in seconds
+    });
+
+    return response; // Return modified response
   } catch (error) {
     console.error("Error in login route:", error);
     return NextResponse.json(

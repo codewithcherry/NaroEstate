@@ -63,16 +63,16 @@ const Navbar = () => {
   const handleSignout = async (e) => {
     e.preventDefault();
     try {
-      setSignoutLoading(true);
-      const response = await axios.post('/api/user/signout', {}, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      toast({
-        title: response.data.type,
-        description: response.data.message,
-      });
-      signout();
-      router.push('/');
+      // setSignoutLoading(true);
+      // const response = await axios.post('/api/user/signout', {}, {
+      //   headers: { 'Content-Type': 'application/json' },
+      // });
+      // toast({
+      //   title: response.data.type,
+      //   description: response.data.message,
+      // });
+      await signout();
+      
     } catch (error) {
       toast({
         title: error.response.data?.type || 'Error',
