@@ -87,6 +87,8 @@ const ListingFilter = () => {
   const applyFilters = useCallback(() => {
     setIsDialogOpen(false);
 
+    setActiveButton('All')
+
     // Construct query parameters
     const queryParams = new URLSearchParams();
 
