@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
+import { motion } from "framer-motion"; // Import Framer Motion
 
 const testimonials = [
   {
@@ -51,26 +52,33 @@ const TestimonialSection = () => {
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         {testimonials.map((testimonial, index) => (
-          <Card
+          <motion.div
             key={index}
-            className="shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl"
+            initial={{ opacity: 0, y: 50 }} // Start hidden and slightly below
+            whileInView={{ opacity: 1, y: 0 }} // Animate when in view
+            viewport={{ once: true, amount: 0.2 }} // Trigger once, when 20% of the card is visible
+            transition={{ duration: 0.6, delay: index * 0.2 }} // Staggered delay
           >
-            <CardContent className="p-6 relative">
-              <Quote className="w-8 h-8 text-gray-300 absolute top-4 right-4" />
-              <div className="flex items-center mb-4">
-                <img
-                  src={testimonial.imageUrl}
-                  alt={testimonial.name}
-                  className="w-16 h-16 rounded-full mr-4"
-                />
-                <div>
-                  <h3 className="text-lg font-semibold">{testimonial.name}</h3>
-                  <p className="text-gray-500">{testimonial.role}</p>
+            <Card
+              className="shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl"
+            >
+              <CardContent className="p-6 relative">
+                <Quote className="w-8 h-8 text-gray-300 absolute top-4 right-4" />
+                <div className="flex items-center mb-4">
+                  <img
+                    src={testimonial.imageUrl}
+                    alt={testimonial.name}
+                    className="w-16 h-16 rounded-full mr-4"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold">{testimonial.name}</h3>
+                    <p className="text-gray-500">{testimonial.role}</p>
+                  </div>
                 </div>
-              </div>
-              <p className="text-gray-700">{testimonial.feedback}</p>
-            </CardContent>
-          </Card>
+                <p className="text-gray-700">{testimonial.feedback}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </section>
