@@ -1,20 +1,36 @@
-import HowItWorks from '@/components/react-components/about/HowItWorks'
-import OfferCards from '@/components/react-components/about/OfferCards'
-import RecentArticles from '@/components/react-components/about/RecentArticles'
-import StatsSection from '@/components/react-components/about/StatsSection'
-import TeamSection from '@/components/react-components/about/TeamSection'
-import React from 'react'
+import AnimatedSection from '@/components/react-components/about/AnimatedSection';
+import HowItWorks from '@/components/react-components/about/HowItWorks';
+import OfferCards from '@/components/react-components/about/OfferCards';
+import RecentArticles from '@/components/react-components/about/RecentArticles';
+import StatsSection from '@/components/react-components/about/StatsSection';
+import TeamSection from '@/components/react-components/about/TeamSection';
+import React from 'react';
 
-const page = () => {
+
+const Page = () => {
   return (
     <div>
-      <StatsSection />
-      <HowItWorks />
-      <RecentArticles />
-      <TeamSection />
-      <OfferCards />
-    </div>
-  )
-}
+      <AnimatedSection>
+        <StatsSection />
+      </AnimatedSection>
 
-export default page
+      <AnimatedSection>
+        <HowItWorks />
+      </AnimatedSection>
+
+      <AnimatedSection>
+        <RecentArticles />
+      </AnimatedSection>
+
+      <AnimatedSection>
+        <TeamSection />
+      </AnimatedSection>
+
+      <AnimatedSection>
+        <OfferCards />
+      </AnimatedSection>
+    </div>
+  );
+};
+
+export default Page;
