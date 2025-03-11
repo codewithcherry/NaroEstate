@@ -14,9 +14,8 @@ import {
 } from '../ui/dropdown-menu';
 import { LogOut, User, Settings, House, Search, Menu, X } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
-import { debounce } from 'lodash';
+
 
 // Constants for paths and labels
 const NAV_LINKS = [
@@ -55,24 +54,24 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
-  const handleSearchChange = debounce((event) => {
+  // Handle search input change
+  const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    // Add search logic here (e.g., API call)
-  }, 300);
+  };
+
+  // Handle form submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Redirect to the listings page with the search query as a URL parameter
+      router.push(`/listings?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   const handleSignout = async (e) => {
     e.preventDefault();
     try {
-      // setSignoutLoading(true);
-      // const response = await axios.post('/api/user/signout', {}, {
-      //   headers: { 'Content-Type': 'application/json' },
-      // });
-      // toast({
-      //   title: response.data.type,
-      //   description: response.data.message,
-      // });
       await signout();
-      
     } catch (error) {
       toast({
         title: error.response.data?.type || 'Error',
@@ -97,11 +96,12 @@ const Navbar = () => {
 
         {/* Search Bar (Desktop) */}
         <div className="hidden sm:block max-w-lg w-full mx-8">
-          <form onSubmit={(e) => e.preventDefault()} className="w-full">
+          <form onSubmit={handleSearchSubmit} className="w-full">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search places..."
+                value={searchQuery}
                 onChange={handleSearchChange}
                 className="px-4 py-2 pr-10 rounded-lg w-full focus:ring-2 focus:ring-slate-500 focus:outline-none"
               />
@@ -193,11 +193,12 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="sm:hidden bg-slate-200 px-6 py-4">
-          <form onSubmit={(e) => e.preventDefault()} className="mb-4">
+          <form onSubmit={handleSearchSubmit} className="mb-4">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search places..."
+                value={searchQuery}
                 onChange={handleSearchChange}
                 className="px-4 py-2 pr-10 rounded-lg w-full focus:ring-2 focus:ring-slate-500 focus:outline-none"
               />

@@ -6,7 +6,6 @@ export const GET = async (request) => {
     try {
         await connect();
 
-        // Extract query parameters from the request URL
         const { searchParams } = new URL(request.url);
         const listingType = searchParams.get('listingType')?.split(',') || [];
         const propertyType = searchParams.get('propertyType')?.split(',') || [];
@@ -14,55 +13,82 @@ export const GET = async (request) => {
         const baths = searchParams.get('baths');
         const city = searchParams.get('city');
         const state = searchParams.get('state');
+        const search = searchParams.get('search'); // Search term
         const page = parseInt(searchParams.get('page')) || 1;
 
         const listingsPerPage = 6;
         const skip = (page - 1) * listingsPerPage;
 
-        // Build the MongoDB query based on the extracted parameters
-        const query = {};
+        // Build filters for MongoDB aggregation
+        const filters = [];
 
-        // Handle listingType filter
         if (listingType.length > 0 && !listingType.includes('all')) {
-            query.listingType = { $in: listingType };
+            filters.push({ listingType: { $in: listingType } });
         }
 
-        // Handle propertyType filter
         if (propertyType.length > 0) {
-            query.propertyType = { $in: propertyType };
+            filters.push({ propertyType: { $in: propertyType } });
         }
 
-        // Handle beds filter
         if (beds) {
-            query["propertyDetails.beds"] = parseInt(beds, 10); // Use dot notation for nested fields
+            filters.push({ "propertyDetails.beds": parseInt(beds, 10) });
         }
 
-        // Handle baths filter
         if (baths) {
-            query["propertyDetails.baths"] = parseInt(baths, 10); // Use dot notation for nested fields
+            filters.push({ "propertyDetails.baths": parseInt(baths, 10) });
         }
 
-        // Handle city filter
         if (city) {
-            query["address.city"] = city; // Use dot notation for nested fields
+            filters.push({ "address.city": city });
         }
 
-        // Handle state filter
         if (state) {
-            query["address.state"] = state; // Use dot notation for nested fields
+            filters.push({ "address.state": state });
         }
 
-        // Log the constructed query for debugging
-        console.log("Constructed Query:", JSON.stringify(query, null, 2));
+        // Define the aggregation pipeline
+        const pipeline = [];
 
-        // Fetch listings based on the constructed query
-        const totalListings = await Listing.countDocuments(query);
-        const listings = await Listing.find(query).skip(skip).limit(listingsPerPage);
+        // Add Atlas Search stage if search term exists
+        if (search) {
+            pipeline.push({
+                $search: {
+                    index: "default", // Change this to your search index name
+                    text: {
+                        query: search,
+                        path: ["title", "description", "address.city", "address.state"],
+                        fuzzy: {
+                            maxEdits: 1, // Allow minor typos
+                        }
+                    }
+                }
+            });
+        }
 
-        const totalPages = Math.ceil(totalListings / listingsPerPage);
+        // Apply filters
+        if (filters.length > 0) {
+            pipeline.push({ $match: { $and: filters } });
+        }
+
+        // Pagination
+        pipeline.push(
+            { $skip: skip },
+            { $limit: listingsPerPage }
+        );
+
+        // Fetch total listings count
+        const totalListings = await Listing.aggregate([
+            ...(search ? [{ $search: pipeline[0].$search }] : []),
+            ...(filters.length > 0 ? [{ $match: { $and: filters } }] : []),
+            { $count: "total" }
+        ]);
+
+        const listings = await Listing.aggregate(pipeline);
+        const totalCount = totalListings.length > 0 ? totalListings[0].total : 0;
+        const totalPages = Math.ceil(totalCount / listingsPerPage);
 
         const pagination = {
-            totalPages: totalPages,
+            totalPages,
             currentPage: page,
             prevPage: page > 1 ? page - 1 : null,
             nextPage: page < totalPages ? page + 1 : null,
@@ -86,7 +112,7 @@ export const GET = async (request) => {
             {
                 type: 'error',
                 message: 'Internal Server Error. Please try again later.',
-                error: error.message // Avoid exposing sensitive error details
+                error: error.message
             },
             { status: 500 }
         );
