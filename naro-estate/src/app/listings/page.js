@@ -5,8 +5,8 @@ import axios from "axios";
 import ListingCard from "@/components/react-components/listing/ListingCard";
 import { Loader2 } from "lucide-react";
 import ListingFilter from "@/components/react-components/listing/ListingFilter";
-import { useRouter } from 'next/compat/router';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from "next/compat/router";
+import { useSearchParams } from "next/navigation";
 import ListingsPagination from "@/components/react-components/listing/ListingsPagination";
 
 const ListingGrid = ({ pagination, setPagination }) => {
@@ -19,12 +19,13 @@ const ListingGrid = ({ pagination, setPagination }) => {
 
   useEffect(() => {
     const fetchListings = async () => {
+      setLoading(true); // Reset loading state immediately
       try {
         console.log(searchParams.toString());
         const query = new URLSearchParams(searchParams.toString());
         const response = await axios.get(`/api/listings?${query.toString()}`);
         setListings(response.data.listings);
-        setPagination(response.data.pagination);  // Update pagination state
+        setPagination(response.data.pagination); // Update pagination state
       } catch (err) {
         setError(new Error("Failed to fetch listings"));
       } finally {
@@ -35,16 +36,17 @@ const ListingGrid = ({ pagination, setPagination }) => {
     fetchListings();
   }, [searchParams, setPagination]); // Include setPagination in dependencies
 
-  if (loading)
+  if (error) throw error; // Trigger error page
+
+  if (loading) {
     return (
       <div className="container mx-auto">
         <div className="flex justify-center items-center h-80">
-          <Loader2 className="animate-spin h-12 w-12 text-gray-500" />
+          <Loader2 className="animate-spin h-12 w-12 text-black" />
         </div>
       </div>
     );
-
-  if (error) throw error; // Trigger error page
+  }
 
   return (
     <div className="container mx-auto mt-4">
@@ -76,14 +78,14 @@ const Page = () => {
         }
       >
         <ListingFilter />
-        <ListingGrid pagination={pagination} setPagination={setPagination} /> {/* Pass pagination as prop */}
+        <ListingGrid pagination={pagination} setPagination={setPagination} />
         <div className="my-4">
-        <ListingsPagination
-          totalPages={pagination.totalPages}
-          currentPage={pagination.currentPage}
-          hasPrevPage={pagination.hasPrevPage}
-          hasNextPage={pagination.hasNextPage}
-        />
+          <ListingsPagination
+            totalPages={pagination.totalPages}
+            currentPage={pagination.currentPage}
+            hasPrevPage={pagination.hasPrevPage}
+            hasNextPage={pagination.hasNextPage}
+          />
         </div>
       </Suspense>
     </div>
