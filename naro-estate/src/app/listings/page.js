@@ -40,7 +40,7 @@ const ListingGrid = ({ pagination, setPagination }) => {
 
   if (loading) {
     return (
-      <div className="container mx-auto">
+      <div className="container h-[60vh] mx-auto">
         <div className="flex justify-center items-center h-80">
           <Loader2 className="animate-spin h-12 w-12 text-black" />
         </div>
@@ -49,14 +49,16 @@ const ListingGrid = ({ pagination, setPagination }) => {
   }
 
   return (
-    <div className="container mx-auto mt-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 justify-items-center">
+    <div className="container mx-auto md:h-[70vh]  mt-10 px-4">
+      <div className="grid grid-cols-2  md:grid-cols-3  gap-4">
         {listings && listings.length > 0 ? (
           listings.map((listing) => (
-            <ListingCard key={listing._id} listing={listing} />
+            <div key={listing._id} className="flex justify-center">
+              <ListingCard listing={listing} className="w-full" />
+            </div>
           ))
         ) : (
-          <p className="col-span-full text-center text-gray-600">
+          <p className="col-span-full text-center  text-gray-600">
             No listings available
           </p>
         )}
@@ -69,7 +71,7 @@ const Page = () => {
   const [pagination, setPagination] = useState({}); // Moved pagination state here
 
   return (
-    <div className="h-screen mt-4">
+    <div className="container mx-auto  mt-4">
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">

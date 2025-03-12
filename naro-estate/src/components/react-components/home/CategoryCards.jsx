@@ -57,7 +57,7 @@ const CategoryCards = () => {
 
       {/* Mobile View */}
       <div className="lg:hidden mt-8">
-        <div className="grid grid-cols-2 gap-4">
+        
           {/* First category (Full Width) */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -85,6 +85,7 @@ const CategoryCards = () => {
           </motion.div>
 
           {/* 2x2 Grid for Remaining Categories */}
+          <div className="grid grid-cols-2 gap-4 mt-4">
           {categories.slice(1).map((category, index) => (
             <motion.div
               key={category.name}

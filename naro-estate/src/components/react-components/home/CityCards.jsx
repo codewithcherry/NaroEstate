@@ -57,7 +57,7 @@ const CityCards = () => {
 
       {/* Mobile View */}
       <div className="lg:hidden mt-8">
-        <div className="grid grid-cols-2 gap-4">
+        
           {/* First City (Full Width) */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -85,6 +85,7 @@ const CityCards = () => {
           </motion.div>
 
           {/* 2x2 Grid for Remaining Cities */}
+          <div className="grid grid-cols-2 gap-4 mt-4">
           {cities.slice(1).map((city, index) => (
             <motion.div
               key={city.name}
