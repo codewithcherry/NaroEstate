@@ -41,11 +41,7 @@ const notificationSchema = new Schema(
             type: String,
             default: "https://i.pravatar.cc/40", // Default avatar URL
           },
-          userId: {
-            type: mongoose.Schema.Types.ObjectId, // Reference to the sender's user ID
-            ref: "User", // Assuming you have a User model
-            required: true,
-          },
+          
         },
         recipient: {
           type: mongoose.Schema.Types.ObjectId, // Reference to the recipient's user ID

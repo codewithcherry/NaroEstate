@@ -2,6 +2,7 @@ import Listing from "@/lib/models/listing.model";
 import connect from "@/lib/mongoDb/database";
 import { NextResponse } from "next/server";
 import User from "@/lib/models/user.model";
+import createNotification from "@/lib/services/notification";
 
 export const PUT = async (request) => {
   try {
@@ -76,6 +77,31 @@ export const PUT = async (request) => {
         }
       );
     }
+
+    const message = `
+  <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; text-align: center;">
+    <h2 style="color: #4A90E2;">Hi User,</h2>
+    <p style="color: #333; font-size: 16px;">You have successfully updated your listing on <strong>NaroEstate</strong>.</p>
+    <p style="color: #333; font-size: 16px;">Click the button below to view the updates:</p>
+    <a href="${process.env.DOMAIN_URL}/listings/${listingId}" 
+       style="display: inline-block; background-color: #4A90E2; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+      View Listing
+    </a>
+    <p style="margin-top: 20px; color: #666; font-size: 14px;">Best Regards,<br>Team NaroEstate</p>
+  </div>
+`;
+
+
+    await createNotification( {
+      title: "Listing Updated",
+      message: message,
+      type: "account",
+      sender: {
+        name: "Team NaroEstate",
+        avatar: "https://i.pravatar.cc/40?img=1",
+      },
+      recipient: userId, // Replace with actual user ID
+    })
 
     return NextResponse.json({
       type: "success",

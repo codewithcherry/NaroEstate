@@ -4,7 +4,7 @@ import Notification from "../models/notification.model";
 const createNotification = async (notificationData) => {
     try {
       // Connect to the database
-      await connectDB();
+      await connect();
   
       // Create a new notification instance
       const newNotification = new Notification({
@@ -14,7 +14,6 @@ const createNotification = async (notificationData) => {
         sender: {
           name: notificationData.sender.name,
           avatar: notificationData.sender.avatar,
-          userId: notificationData.sender.userId,
         },
         recipient: notificationData.recipient,
       });
