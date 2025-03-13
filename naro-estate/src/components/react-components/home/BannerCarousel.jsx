@@ -397,7 +397,7 @@ const BannerCarousel = () => {
         {properties.map((property) => (
           <CarouselItem key={property._id} className="flex-[0_0_100%] p-4">
             <div className="max-w-7xl mx-auto px-4">
-              <Card className="relative bg-card border border-muted-foreground shadow-lg overflow-hidden h-[28rem] rounded-2xl">
+              <Card className="relative bg-card border border-muted-foreground shadow-lg overflow-hidden h-[32rem] rounded-2xl">
                 {/* Background Image */}
                 <div
                   className="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105"
