@@ -7,8 +7,11 @@ export function cn(...inputs) {
 
 // utils/formatTimestamp.js
 export const formatTimestamp = (timestamp) => {
+  // Convert the timestamp string to a number (in milliseconds)
+  const timestampMs = new Date(timestamp).getTime();
+
   const now = Date.now();
-  const diff = now - timestamp;
+  const diff = now - timestampMs; // Use the converted timestamp
 
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);

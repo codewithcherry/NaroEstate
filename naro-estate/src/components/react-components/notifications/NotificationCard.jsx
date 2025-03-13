@@ -73,10 +73,7 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
           {getIcon(type)}
           <h3 className="font-medium">{getPreviewHeader(type)}</h3>
         </div>
-        {!isRead && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
-      </div>
-      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{title}</p>
-      <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center gap-2 mt-2">
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <Clock className="w-4 h-4" />
           <span>{timestamp}</span>
@@ -141,6 +138,11 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
           </Tooltip>
         </div>
       </div>
+        {!isRead && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+        
+      </div>
+      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{title}</p>
+      
     </motion.div>
   );
 };
