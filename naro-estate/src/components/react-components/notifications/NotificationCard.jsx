@@ -1,21 +1,62 @@
 import React from "react";
-import { Check, Star, Trash, Mail, Bell, AtSign, Clock, AlertCircle } from "lucide-react";
+import { Check, Star, Trash, Mail, Bell, AtSign, Clock ,FileText,Calendar,DollarSign,Lock,Megaphone,AlertCircleIcon} from "lucide-react";
 import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // shadcn Tooltip
 
 const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, type, sender, onMarkRead, onStar, onDelete, onSelect }) => {
-  const getIcon = () => {
-    switch (type) {
-      case "message":
-        return <Mail className="w-4 h-4 text-blue-500" />;
-      case "alert":
-        return <Bell className="w-4 h-4 text-red-500" />;
-      case "mention":
-        return <AtSign className="w-4 h-4 text-green-500" />;
-      default:
-        return <AlertCircle className="w-4 h-4 text-gray-500" />;
-    }
-  };
+    const getIcon = (type) => {
+        switch (type) {
+          case "message":
+            return <Mail className="w-4 h-4 text-blue-500" />;
+          case "alert":
+            return <Bell className="w-4 h-4 text-red-500" />;
+          case "mention":
+            return <AtSign className="w-4 h-4 text-green-500" />;
+          case "social":
+            return <Heart className="w-4 h-4 text-pink-500" />;
+          case "assignment":
+            return <FileText className="w-4 h-4 text-purple-500" />;
+          case "reminder":
+            return <Clock className="w-4 h-4 text-orange-500" />;
+          case "invitation":
+            return <Calendar className="w-4 h-4 text-teal-500" />;
+          case "payment":
+            return <DollarSign className="w-4 h-4 text-green-500" />;
+          case "account":
+            return <Lock className="w-4 h-4 text-gray-500" />;
+          case "announcement":
+            return <Megaphone className="w-4 h-4 text-yellow-500" />;
+          default:
+            return <AlertCircleIcon className="w-4 h-4 text-gray-500" />;
+        }
+      };
+
+      const getPreviewHeader = (type) => {
+        switch (type) {
+          case "message":
+            return "New Message";
+          case "alert":
+            return "System Alert";
+          case "mention":
+            return "You Were Mentioned";
+          case "social":
+            return "Social Activity";
+          case "assignment":
+            return "New Assignment";
+          case "reminder":
+            return "Reminder";
+          case "invitation":
+            return "Event Invitation";
+          case "payment":
+            return "Payment Received";
+          case "account":
+            return "Account Activity";
+          case "announcement":
+            return "New Announcement";
+          default:
+            return "Notification";
+        }
+      };
 
   return (
     <motion.div
@@ -29,8 +70,8 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {getIcon()}
-          <h3 className="font-medium">{title}</h3>
+          {getIcon(type)}
+          <h3 className="font-medium">{getPreviewHeader(type)}</h3>
         </div>
         {!isRead && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
       </div>

@@ -27,10 +27,10 @@ const notificationSchema = new Schema(
           default: false, // Notifications are not starred by default
         },
         type: {
-          type: String,
-          required: true,
-          enum: ["message", "alert", "mention"], // Only allow specific types
-        },
+            type: String,
+            required: true,
+            enum: ["message", "alert", "mention", "social", "assignment", "reminder", "invitation", "payment", "account", "announcement"],
+          },
         sender: {
           name: {
             type: String,
@@ -58,6 +58,6 @@ const notificationSchema = new Schema(
       }
 );
 
-const Enquiry = mongoose.models.Notification || mongoose.model("Notification", notificationSchema);
+const Notification = mongoose.models.Notification || mongoose.model("Notification", notificationSchema);
 
-export default Enquiry;
+export default Notification;
