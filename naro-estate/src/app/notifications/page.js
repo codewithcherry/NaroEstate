@@ -4,16 +4,17 @@ import NotificationCard from "@/components/react-components/notifications/Notifi
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input"; // shadcn UI Input
 import { Button } from "@/components/ui/button"; // shadcn UI Button
-import { Search, Loader, Reply, Check, Star, Trash } from "lucide-react";
+import { Search, Loader, Check, Star, Trash, X } from "lucide-react"; // Added X icon
 import { motion, AnimatePresence } from "framer-motion"; // For animations
 import { TooltipProvider } from "@/components/ui/tooltip"; // Import TooltipProvider
+import { formatTimestamp } from "@/lib/utils"; // Import timestamp utility
 
 const notificationsData = [
   {
     id: "1",
     title: "New Message",
     message: "You have a new message from John.",
-    timestamp: "2h ago",
+    timestamp: Date.now() - 3600000, // 1 hour ago
     isRead: false,
     isStarred: true,
     type: "message",
@@ -23,7 +24,7 @@ const notificationsData = [
     id: "2",
     title: "System Update",
     message: "A new system update is available.",
-    timestamp: "5h ago",
+    timestamp: Date.now() - 86400000 * 2, // 2 days ago
     isRead: true,
     isStarred: false,
     type: "alert",
@@ -33,7 +34,7 @@ const notificationsData = [
     id: "3",
     title: "Mention",
     message: "You were mentioned in a comment by Jane.",
-    timestamp: "1d ago",
+    timestamp: Date.now() - 86400000 * 7, // 1 week ago
     isRead: false,
     isStarred: false,
     type: "mention",
@@ -68,6 +69,10 @@ const NotificationPage = () => {
 
   const handleSelectNotification = (id) => {
     setSelectedNotification(id); // Update the selected notification ID
+  };
+
+  const handleClosePreview = () => {
+    setSelectedNotification(null); // Reset preview to default
   };
 
   const filteredNotifications = notifications.filter((notification) => {
@@ -105,6 +110,7 @@ const NotificationPage = () => {
               <NotificationCard
                 key={notification.id}
                 {...notification}
+                timestamp={formatTimestamp(notification.timestamp)} // Format timestamp
                 onMarkRead={handleMarkRead}
                 onStar={handleStar}
                 onDelete={handleDelete}
@@ -112,9 +118,11 @@ const NotificationPage = () => {
               />
             ))}
           </div>
-          <Button variant="ghost" className="w-full mt-4">
+          <div className="flex justify-center">
+          <Button variant="ghost" className=" mt-4 bg-primary text-white hover:bg-muted">
             Load More
           </Button>
+          </div>
         </div>
 
         {/* Column B: Preview Section */}
@@ -130,18 +138,26 @@ const NotificationPage = () => {
                 className="p-6 bg-white border rounded-lg dark:bg-gray-800 dark:border-gray-700"
               >
                 {/* Header */}
-                <div className="flex items-center gap-3">
-                  <img
-                    src={selectedNotificationData.sender.avatar}
-                    alt={selectedNotificationData.sender.name}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <h2 className="text-xl font-bold">{selectedNotificationData.sender.name}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {selectedNotificationData.timestamp}
-                    </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={selectedNotificationData.sender.avatar}
+                      alt={selectedNotificationData.sender.name}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                      <h2 className="text-xl font-bold">{selectedNotificationData.sender.name}</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {formatTimestamp(selectedNotificationData.timestamp)} {/* Format timestamp */}
+                      </p>
+                    </div>
                   </div>
+                  <button
+                    onClick={handleClosePreview}
+                    className="p-1 text-gray-500 hover:text-red-500"
+                  >
+                    <X className="w-5 h-5" /> {/* Close button */}
+                  </button>
                 </div>
 
                 {/* Body */}
@@ -154,10 +170,6 @@ const NotificationPage = () => {
 
                 {/* Footer */}
                 <div className="flex items-center gap-3 mt-6">
-                  <Button variant="outline" size="sm">
-                    <Reply className="w-4 h-4 mr-2" />
-                    Reply
-                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
