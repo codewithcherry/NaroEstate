@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '../ui/dropdown-menu';
-import { LogOut, User, Settings, House, Search, Menu, X } from 'lucide-react';
+import { LogOut, User, Settings, House, Search, Menu, X ,BellIcon} from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
@@ -29,6 +29,7 @@ const LOGGED_IN_LINKS = [
   { path: '/my-listings', label: 'My Listings', icon: <House className="w-4 h-4 mr-2" /> },
   { path: '/profile', label: 'Profile', icon: <User className="w-4 h-4 mr-2" /> },
   { path: '/settings', label: 'Settings', icon: <Settings className="w-4 h-4 mr-2" /> },
+  {path: '/notifications', label: 'Notifications', icon: <BellIcon className="w-4 h-4 mr-2" />}
 ];
 
 const Navbar = () => {
