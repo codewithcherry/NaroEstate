@@ -75,7 +75,7 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
         </div>
         {!isRead && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
       </div>
-      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{message}</p>
+      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{title}</p>
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <Clock className="w-4 h-4" />

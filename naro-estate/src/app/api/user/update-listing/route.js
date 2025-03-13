@@ -45,6 +45,8 @@ export const PUT = async (request) => {
       );
     }
 
+    const user = await User.findById(userId);
+
     // Find and update the listing
     const updatedListing = await Listing.findOneAndUpdate(
       { _id: listingId, createdBy: userId }, // Ensure the listing belongs to the user
@@ -70,7 +72,8 @@ export const PUT = async (request) => {
       return NextResponse.json(
         {
           type: "error",
-          message: "Listing not found or you do not have permission to update it.",
+          message:
+            "Listing not found or you do not have permission to update it.",
         },
         {
           status: 404,
@@ -78,22 +81,13 @@ export const PUT = async (request) => {
       );
     }
 
-    const message = `
-  <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; text-align: center;">
-    <h2 style="color: #4A90E2;">Hi User,</h2>
-    <p style="color: #333; font-size: 16px;">You have successfully updated your listing on <strong>NaroEstate</strong>.</p>
-    <p style="color: #333; font-size: 16px;">Click the button below to view the updates:</p>
-    <a href="${process.env.DOMAIN_URL}/listings/${listingId}" 
-       style="display: inline-block; background-color: #4A90E2; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-      View Listing
-    </a>
-    <p style="margin-top: 20px; color: #666; font-size: 14px;">Best Regards,<br>Team NaroEstate</p>
-  </div>
-`;
+    const message = `Hey ${user.username} , Your listing ${updatedListing.title} is updates successfully. Please visit your my listings page and check the updates.
+                                      
+                      Thanks and Regards,
+                      Team NaroEstate`;
 
-
-    await createNotification( {
-      title: "Listing Updated",
+    await createNotification({
+      title: `${updatedListing.title} Listing Updated`,
       message: message,
       type: "account",
       sender: {
@@ -101,7 +95,7 @@ export const PUT = async (request) => {
         avatar: "https://i.pravatar.cc/40?img=1",
       },
       recipient: userId, // Replace with actual user ID
-    })
+    });
 
     return NextResponse.json({
       type: "success",

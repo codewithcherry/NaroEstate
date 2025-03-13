@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion"; // For animations
 import { TooltipProvider } from "@/components/ui/tooltip"; // Import TooltipProvider
 import { formatTimestamp } from "@/lib/utils"; // Import timestamp utility
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"; // shadcn Dialog
+import axios from "axios";
 
 const notificationsData = [
   {
@@ -47,8 +48,33 @@ const notificationsData = [
 const NotificationPage = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [filter, setFilter] = useState("all");
-  const [notifications, setNotifications] = useState(notificationsData);
+  const [notifications, setNotifications] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+
+  const [loading,setLoading]=useState(false);
+  
+
+  const fetchNotifications=async () => {
+
+    setLoading(true);
+    
+    try {
+        
+        const response=await axios.get('/api/user/notifications',{
+            headers:{
+                "Content-Type":'application/json',
+            }
+        })
+        const data=response.data;
+        setNotifications(data.data)
+        console.log(data)
+    } catch (error) {
+        console.log('error',error)
+    }
+    finally{
+        setLoading(false)
+    }
+  }
 
   // Detect if the device is mobile
   useEffect(() => {
@@ -58,6 +84,8 @@ const NotificationPage = () => {
 
     checkIsMobile(); // Check on initial render
     window.addEventListener("resize", checkIsMobile); // Check on window resize
+
+    fetchNotifications();
 
     return () => {
       window.removeEventListener("resize", checkIsMobile); // Cleanup
@@ -100,6 +128,15 @@ const NotificationPage = () => {
   const selectedNotificationData = notifications.find(
     (n) => n.id === selectedNotification
   );
+
+  const parseHtmlToText = (html) => {
+    if (typeof window !== "undefined") {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      return doc.body.textContent || "";
+    }
+    return html;
+  };
 
   return (
     <TooltipProvider>
@@ -180,9 +217,9 @@ const NotificationPage = () => {
                   {/* Body */}
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold">{selectedNotificationData.title}</h3>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    <div className="mt-2 text-gray-600 dark:text-gray-400">
                       {selectedNotificationData.message}
-                    </p>
+                    </div>
                   </div>
 
                   {/* Footer */}
