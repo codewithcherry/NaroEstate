@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"; // Import TooltipProv
 import { formatTimestamp } from "@/lib/utils"; // Import timestamp utility
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"; // shadcn Dialog
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const notificationsData = [
   {
@@ -52,6 +53,8 @@ const NotificationPage = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   const [loading,setLoading]=useState(false);
+
+  const {toast}=useToast();
   
 
   const fetchNotifications=async () => {
@@ -76,6 +79,8 @@ const NotificationPage = () => {
     }
   }
 
+ 
+
   // Detect if the device is mobile
   useEffect(() => {
     const checkIsMobile = () => {
@@ -92,17 +97,81 @@ const NotificationPage = () => {
     };
   }, []);
 
-  const handleMarkRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: !n.isRead } : n))
-    );
+  const handleMarkRead = async (id,flag) => {
+    try {
+      // Make a PATCH request to update the notification
+      const response = await axios.patch(
+        "/api/user/update-notification", // Your PATCH route
+        {
+          NotificationId: id, // Pass the notification ID
+          updatedNotification: {
+            isRead: flag, // Set isRead to true (or toggle it if needed)
+          },
+        },
+      );
+  
+      // Handle the response
+      if (response.data.type === "success") {
+        // Update the local state for the specific notification
+        setNotifications((prev) =>
+          prev.map((n) => (n._id === id ? { ...n, isRead: flag } : n))
+        );
+
+        toast({
+            title:response.data.type,
+            description:response.data.message,
+        })
+      } else {
+        console.error("Failed to update notification:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating notification:", error);
+      toast({
+        title:error.response.data.type,
+        description:error.response.data.message,
+        variant:'destructive'
+      })
+    }
   };
 
-  const handleStar = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isStarred: !n.isStarred } : n))
-    );
-  };
+  const handleStar =async (id,flag) => {
+    try {
+      // Make a PATCH request to update the notification
+      const response = await axios.patch(
+        "/api/user/update-notification", // Your PATCH route
+        {
+          NotificationId: id, // Pass the notification ID
+          updatedNotification: {
+            isStarred: flag, // Set isRead to true (or toggle it if needed)
+          },
+        },
+      );
+  
+      // Handle the response
+      if (response.data.type === "success") {
+        // Update the local state for the specific notification
+        setNotifications((prev) =>
+          prev.map((n) => (n._id === id ? { ...n, isStarred: flag } : n))
+        );
+
+        toast({
+            title:response.data.type,
+            description:response.data.message,
+        })
+      } else {
+        console.error("Failed to update notification:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating notification:", error);
+      toast({
+        title:error.response.data.type,
+        description:error.response.data.message,
+        variant:'destructive'
+      })
+    }
+  }; 
+  
+
 
   const handleDelete = (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -111,7 +180,33 @@ const NotificationPage = () => {
     }
   };
 
-  const handleSelectNotification = (id) => {
+  const handleSelectNotification = async(id) => {
+    try {
+        // Make a PATCH request to update the notification
+        const response = await axios.patch(
+          "/api/user/update-notification", // Your PATCH route
+          {
+            NotificationId: id, // Pass the notification ID
+            updatedNotification: {
+              isRead: true, // Set isRead to true (or toggle it if needed)
+            },
+          },
+        );
+    
+        // Handle the response
+        if (response.data.type === "success") {
+          // Update the local state for the specific notification
+          setNotifications((prev) =>
+            prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
+          );
+  
+        } else {
+          console.error("Failed to update notification:", response.data.message);
+        }
+      } catch (error) {
+        console.error("Error updating notification:", error);
+       
+      }
     setSelectedNotification(id); // Update the selected notification ID
   };
 
@@ -126,7 +221,7 @@ const NotificationPage = () => {
   });
 
   const selectedNotificationData = notifications.find(
-    (n) => n.id === selectedNotification
+    (n) => n._id === selectedNotification
   );
 
   const parseHtmlToText = (html) => {
@@ -159,9 +254,9 @@ const NotificationPage = () => {
             </Button>
           </div>
           <div className="space-y-4">
-            {filteredNotifications.map((notification) => (
+            {filteredNotifications.map((notification,index) => (
               <NotificationCard
-                key={notification.id}
+                key={index}
                 {...notification}
                 timestamp={formatTimestamp(notification.timestamp)} // Format timestamp
                 onMarkRead={handleMarkRead}

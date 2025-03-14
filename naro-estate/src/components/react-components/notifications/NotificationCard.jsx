@@ -3,7 +3,7 @@ import { Check, Star, Trash, Mail, Bell, AtSign, Clock ,FileText,Calendar,Dollar
 import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // shadcn Tooltip
 
-const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, type, sender, onMarkRead, onStar, onDelete, onSelect }) => {
+const NotificationCard = ({ _id, title, message, timestamp, isRead, isStarred, type, sender, onMarkRead, onStar, onDelete, onSelect }) => {
     const getIcon = (type) => {
         switch (type) {
           case "message":
@@ -63,7 +63,7 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      onClick={() => onSelect(id)} // Call onSelect when the card is clicked
+      onClick={() => onSelect(_id)} // Call onSelect when the card is clicked
       className={`p-4 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${
         isRead ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"
       }`}
@@ -85,7 +85,7 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click event from firing
-                  onMarkRead(id);
+                  onMarkRead(_id,!isRead);
                 }}
                 className="p-1 text-gray-500 hover:text-blue-500"
               >
@@ -103,7 +103,7 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click event from firing
-                  onStar(id);
+                  onStar(_id,!isStarred);
                 }}
                 className="p-1 text-gray-500 hover:text-yellow-500"
               >
@@ -125,7 +125,7 @@ const NotificationCard = ({ id, title, message, timestamp, isRead, isStarred, ty
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click event from firing
-                  onDelete(id);
+                  onDelete(_id);
                 }}
                 className="p-1 text-gray-500 hover:text-red-500"
               >
