@@ -173,10 +173,43 @@ const NotificationPage = () => {
   
 
 
-  const handleDelete = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-    if (selectedNotification === id) {
-      setSelectedNotification(null); // Clear preview if the deleted notification is selected
+  const handleDelete = async (id) => {
+    try {
+      // Make the API call to delete the notification using axios
+      const response = await axios.delete('/api/user/delete-notification', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: { notificationId: id }, // Axios uses `data` for the request body in DELETE requests
+      });
+  
+      // Check if the deletion was successful
+      if (response.status === 200) {
+        // Update the local state to remove the deleted notification
+        setNotifications((prev) => prev.filter((n) => n._id !== id));
+  
+        // Clear the preview if the deleted notification is selected
+        if (selectedNotification === id) {
+          setSelectedNotification(null);
+        }
+  
+        console.log(response.data.message); // Log success message
+        toast({
+            title:"success",
+            description:"Notification deleted Successfully!"
+        })
+      } else {
+        // Handle error response
+        console.error(response.data.message); // Log error message
+        
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      toast({
+        title:"error",
+        description:"Erro Deleting Notification! try again!",
+        variant:"destructive"
+    })
     }
   };
 

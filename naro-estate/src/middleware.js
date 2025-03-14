@@ -30,7 +30,8 @@ const privatePaths = [
   "/api/user/mylistings",
   "/api/user/update-listing",
   "/api/user/notifications",
-  "/api/user/update-notification"
+  "/api/user/update-notification",
+  "/api/user/delete-notification"
 ];
 
 const isPublicPath = (pathname) => publicPaths.includes(pathname);
