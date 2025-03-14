@@ -56,28 +56,33 @@ const NotificationPage = () => {
 
   // Detect if the device is mobile
   useEffect(() => {
-    if( !isLoggedIn){
-        router.push('/login')
+    if (loading) {
+        return;
+    }
+
+    if (!isLoggedIn) {
+        router.push('/login');
         toast({
-            title:"Unauthroized user",
-            description:"Login to your account to view notifications page"
-        })
+            title: "Unauthorized user",
+            description: "Login to your account to view the notifications page",
+        });
+        return;
     }
-    else{
-        const checkIsMobile = () => {
-            setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
-          };
-      
-          checkIsMobile(); // Check on initial render
-          window.addEventListener("resize", checkIsMobile); // Check on window resize
-      
-          fetchNotifications();
-      
-          return () => {
-            window.removeEventListener("resize", checkIsMobile); // Cleanup
-          };
-    }
-  }, []);
+
+    const checkIsMobile = () => {
+        setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
+    };
+
+    checkIsMobile(); // Check on initial render
+    window.addEventListener("resize", checkIsMobile); // Listen for window resize
+
+    fetchNotifications(); // Fetch notifications when user is logged in
+
+    return () => {
+        window.removeEventListener("resize", checkIsMobile); // Cleanup listener
+    };
+}, [loading, isLoggedIn]);
+
 
   const handleMarkRead = async (id, flag) => {
     try {
@@ -341,8 +346,9 @@ const NotificationPage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        handleMarkRead(selectedNotificationData.id)
+                      onClick={() =>{
+                        setSelectedNotification(null)
+                        handleMarkRead(selectedNotificationData._id,!selectedNotificationData.isRead)}
                       }
                     >
                       <Check className="w-4 h-4 mr-2" />
