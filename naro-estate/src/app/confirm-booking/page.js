@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/compat/router";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
-const Page = () => {
+const ConfirmBookingPage = () => {
   const [token, setToken] = useState(null);
   const [message, setMessage] = useState("");
   const [bookingDetails, setBookingDetails] = useState(null);
@@ -79,5 +79,12 @@ const Page = () => {
     </div>
   );
 };
+
+// Wrap the component in a Suspense boundary
+const Page = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <ConfirmBookingPage />
+  </Suspense>
+);
 
 export default Page;
