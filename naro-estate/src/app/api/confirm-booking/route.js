@@ -20,8 +20,8 @@ export const GET = async (request) => {
 
     // Find the pending booking document using the token and populate the listingId field
     const pendingBooking = await PendingBooking.findOne({ token }).populate({
-      path: "listingId", // Field to populate
-      select: "title coverPhoto address listingType stayPrice propertyDetails bookingConfirm queue", // Fields to include from the Listing model
+      path: "listingId",
+      select: "title coverPhoto address listingType stayPrice propertyDetails bookingsConfirmed pendingBookings queue",
     });
 
     if (!pendingBooking) {
@@ -34,7 +34,7 @@ export const GET = async (request) => {
     const { listingId, checkIn, checkOut } = pendingBooking;
 
     // Fetch the listing document
-    const listing = await Listing.findById(listingId._id);
+    const listing = await Listing.findById(listingId);
 
     if (!listing) {
       return NextResponse.json(
@@ -43,18 +43,29 @@ export const GET = async (request) => {
       );
     }
 
-    // Check for overlapping dates in bookingConfirm
+    // Check for overlapping dates in bookingsConfirmed
     const userDates = getDateRange(checkIn, checkOut);
-    const isAvailable = !userDates.some(date => listing.bookingsConfirmed.includes(date));
+    const isConfirmedOverlap = userDates.some(date => (listing.bookingsConfirmed || []).includes(date));
 
-    if (!isAvailable) {
+    if (isConfirmedOverlap) {
       return NextResponse.json(
-        { type: "error", message: "Selected dates are unavailable" },
+        { type: "error", message: "Selected dates are unavailable (confirmed bookings)" ,pay:false},
         { status: 400 }
       );
     }
 
-    // Add user to the queue if not already in it
+    // Check for overlapping dates in pendingBookings
+    const isPendingOverlap = userDates.some(date => (listing.pendingBookings || []).includes(date));
+
+    if (!isPendingOverlap) {
+      // No overlap with pendingBookings, allow user to proceed to payment
+      return NextResponse.json(
+        { type: "success", message: "You can proceed to payment",pay:true ,data: pendingBooking },
+        { status: 200 }
+      );
+    }
+
+    // Overlap with pendingBookings, add user to the queue if not already in it
     const userInQueue = listing.queue.find(entry => entry.token === token);
     if (!userInQueue) {
       listing.queue.push({ userId: pendingBooking.userId, token, timestamp: new Date() });
@@ -66,12 +77,12 @@ export const GET = async (request) => {
 
     if (userPosition === 0) {
       return NextResponse.json(
-        { type: "success", message: "You can proceed to payment", pay:true, data: pendingBooking },
+        { type: "success", message: "You can proceed to payment",pay:true, data: pendingBooking },
         { status: 200 }
       );
     } else {
       return NextResponse.json(
-        { type: "success", pay:false ,message: `You are in position ${userPosition + 1} in the queue`, data: { position: userPosition + 1 } },
+        { type: "success", message: `You are in position ${userPosition + 1} in the queue`,pay:false, data: { position: userPosition + 1 } },
         { status: 200 }
       );
     }
