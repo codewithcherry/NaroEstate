@@ -131,9 +131,39 @@ const listingSchema = new Schema({
   rating: { type: Number, default: 0 },
 
   //booking related fields
-  pendingBookings: [{ type: Date }], // Array of dates for pending bookings
-  bookingsConfirmed: [{ type: Date }], // Array of dates for confirmed bookings
-  bookingsCancelled: [{ type: Date }], // Array of dates for cancelled bookings
+  pendingBookings: {
+    type: [Date], // Array of dates for pending bookings
+    default: [], // Default to an empty array
+  },
+  bookingsConfirmed: {
+    type: [Date], // Array of dates for confirmed bookings
+    default: [], // Default to an empty array
+  },
+  bookingsCancelled: {
+    type: [Date], // Array of dates for cancelled bookings
+    default: [], // Default to an empty array
+  },
+
+  queue: {
+    type: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId, // Assuming userId is a reference to another document
+          ref: "User",
+          required: true
+        },
+        token: {
+          type: String,
+          required: true
+        },
+        timestamp: {
+          type: Date,
+          default: Date.now // Automatically sets to the current date and time
+        }
+      }
+    ],
+    default: [] // Defaults to an empty array
+  }
 
 }, { timestamps: true });
 

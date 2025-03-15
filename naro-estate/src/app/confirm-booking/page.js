@@ -23,7 +23,7 @@ const ConfirmBookingPage = () => {
 
       const response = await axios.get(`/api/confirm-booking?token=${token}`);
       const data = response.data;
-
+        console.log(data)
       if (data.type === "success") {
         setBookingDetails(data.data); // Set the booking details in state
       } else {
