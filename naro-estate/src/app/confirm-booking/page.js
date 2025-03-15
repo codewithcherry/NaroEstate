@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/compat/router";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
+import BookingConfirmation from "@/components/react-components/booking/BookingConfirmation";
 
 const ConfirmBookingPage = () => {
   const [token, setToken] = useState(null);
@@ -25,7 +26,7 @@ const ConfirmBookingPage = () => {
       const data = response.data;
         console.log(data)
       if (data.type === "success") {
-        setBookingDetails(data.data); // Set the booking details in state
+        setBookingDetails(data); // Set the booking details in state
       } else {
         setMessage(data.message || "Failed to fetch booking details.");
         setError(data.message);
@@ -51,32 +52,7 @@ const ConfirmBookingPage = () => {
   }, [router, searchParams]);
 
   return (
-    <div>
-      <h1>Confirm Booking Page</h1>
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {message && <p>{message}</p>}
-
-      {bookingDetails && (
-        <div>
-          <h2>Booking Details</h2>
-          <p><strong>Check-In:</strong> {new Date(bookingDetails.checkIn).toLocaleDateString()}</p>
-          <p><strong>Check-Out:</strong> {new Date(bookingDetails.checkOut).toLocaleDateString()}</p>
-          <p><strong>Total Price:</strong> ${bookingDetails.totalPrice}</p>
-          <p><strong>Guests:</strong> {bookingDetails.guests}</p>
-
-          <h3>Listing Details</h3>
-          <p><strong>Title:</strong> {bookingDetails.listingId.title}</p>
-          <p><strong>Type:</strong> {bookingDetails.listingId.listingType}</p>
-          <p><strong>Price per Night:</strong> ${bookingDetails.listingId.stayPrice}</p>
-          <img
-            src={bookingDetails.listingId.coverPhoto}
-            alt={bookingDetails.listingId.title}
-            style={{ width: "100%", maxWidth: "300px", height: "auto" }}
-          />
-        </div>
-      )}
-    </div>
+    <BookingConfirmation bookingData={bookingDetails}/>
   );
 };
 
