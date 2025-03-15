@@ -67,7 +67,10 @@ const BookListing = ({listing}) => {
           listingId:listing._id,
           checkIn:checkIn,
           checkOut:checkOut,
-          stayPrice:listing.stayPrice
+          stayPricePerDay:listing.stayPrice,
+          totalPrice,
+          totalDays:calculateNights(),
+          guests,
         },
         {
           headers:{

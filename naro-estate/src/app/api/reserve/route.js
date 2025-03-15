@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 export const POST = async (request) => {
   try {
     const reqBody = await request.json();
-    const { listingId, checkIn, checkOut,stayPrice } = reqBody;
+    const { listingId, checkIn, checkOut,stayPricePerDay,totalPrice,totalDays, guests} = reqBody;
     const userId = request.headers.get("userId");
 
     if (!listingId || !checkIn || !checkOut || !userId) {
@@ -45,6 +45,10 @@ export const POST = async (request) => {
       checkOut: new Date(checkOut),
       token,
       expiresAt,
+      stayPricePerDay,
+      totalPrice,
+      totalDays,
+      guests
     });
 
     return NextResponse.json(

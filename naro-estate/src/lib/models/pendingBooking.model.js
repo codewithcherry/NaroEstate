@@ -17,6 +17,10 @@ const pendingBookingSchema = new Schema(
     checkOut: { type: Date, required: true },
     token: { type: String, required: true, unique: true },
     expiresAt: { type: Date, required: true },
+    totalDays: { type: Number, required: true }, // Total number of days for the stay
+    stayPricePerDay: { type: Number, required: true }, // Price per day for the stay
+    totalPrice: { type: Number, required: true }, // Total price for the stay
+    guests: { type: Number, required: true },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
