@@ -130,6 +130,11 @@ const listingSchema = new Schema({
   // Rating (Average rating)
   rating: { type: Number, default: 0 },
 
+  //booking related fields
+  pendingBookings: [{ type: Date }], // Array of dates for pending bookings
+  bookingsConfirmed: [{ type: Date }], // Array of dates for confirmed bookings
+  bookingsCancelled: [{ type: Date }], // Array of dates for cancelled bookings
+
 }, { timestamps: true });
 
 // Check if the model is already defined in Mongoose's internal registry
