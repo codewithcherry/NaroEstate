@@ -1,0 +1,116 @@
+import { NextResponse } from "next/server";
+import connect from "@/lib/mongoDb/database";
+import Listing from "@/lib/models/listing.model";
+import PendingBooking from "@/lib/models/pendingBooking.model";
+
+// Helper function to generate an array of dates between checkIn and checkOut
+const getDateRange = (checkIn, checkOut) => {
+    const dates = [];
+    let currentDate = new Date(checkIn);
+    const endDate = new Date(checkOut);
+
+    while (currentDate <= endDate) {
+        dates.push(new Date(currentDate).toISOString().split('T')[0]); // Store dates in 'YYYY-MM-DD' format
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+};
+
+// Helper function to clear bookings
+const clearBookings = async (listing, token, datesToClear) => {
+    // Remove the dates from the listing's pendingBookings array
+    listing.pendingBookings = listing.pendingBookings.filter(
+        date => !datesToClear.includes(date)
+    );
+
+    // Add the dates to the listing's bookingsCancelled array
+    listing.bookingsCancelled = [...listing.bookingsCancelled, ...datesToClear];
+
+    // Remove the user from the queue if their token matches
+    listing.queue = listing.queue.filter(
+        queueItem => queueItem.token !== token
+    );
+
+    // Save the updated listing
+    await listing.save();
+
+    return listing;
+};
+
+export const POST = async (request) => {
+    try {
+        const reqbody = await request.json();
+        const { token, listingId, bookingData } = reqbody; // Extract token, listingId, and bookingData from the request body
+        const userId = request.headers.get('userId');
+
+        await connect();
+
+        // Validate userId
+        if (!userId) {
+            return NextResponse.json({
+                type: 'error',
+                message: 'User ID is missing!'
+            }, {
+                status: 400
+            });
+        }
+
+        // Validate token
+        if (!token) {
+            return NextResponse.json({
+                type: 'error',
+                message: 'Booking token is missing!'
+            }, {
+                status: 404
+            });
+        }
+
+        // Find and delete the pending booking using the token
+        const pendingBook = await PendingBooking.findOneAndDelete({ token });
+
+        if (!pendingBook) {
+            return NextResponse.json({
+                type: 'error',
+                message: 'Invalid or expired booking token!'
+            }, {
+                status: 404
+            });
+        }
+
+        // Generate an array of dates to clear from the listing's pendingBookings array
+        const datesToClear = getDateRange(bookingData.checkIn, bookingData.checkOut);
+
+        // Check if the listing exists
+        const listing = await Listing.findById(listingId);
+
+        if (!listing) {
+            return NextResponse.json({
+                type: 'error',
+                message: 'Listing not found!'
+            }, {
+                status: 404
+            });
+        }
+
+        // Use the clearBookings function to handle the updates
+        const updatedListing = await clearBookings(listing, token, datesToClear);
+
+        return NextResponse.json({
+            type: 'success',
+            message: 'Pending booking cleared, dates moved to bookingsCancelled, and user removed from queue!',
+            data: updatedListing
+        }, {
+            status: 200
+        });
+
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({
+            type: 'error',
+            message: "Internal server error"
+        }, {
+            status: 500
+        });
+    }
+};
