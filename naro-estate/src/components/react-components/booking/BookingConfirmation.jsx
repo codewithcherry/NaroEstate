@@ -1,11 +1,19 @@
-'use client';
+"use client";
 
-import { Calendar, Clock, Users, MapPin, Home, CreditCard } from 'lucide-react';
-import { Button } from '@/components/ui/button'; // Assuming shadcn UI Button component
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'; // Assuming shadcn UI Card components
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useToast } from '@/hooks/use-toast';
+import { Calendar, Clock, Users, MapPin, Home, CreditCard, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button"; // Assuming shadcn UI Button component
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card"; // Assuming shadcn UI Card components
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const BookingConfirmation = ({ bookingData }) => {
   const [timeLeft, setTimeLeft] = useState(null); // Track time left
@@ -13,17 +21,23 @@ const BookingConfirmation = ({ bookingData }) => {
 
   const { toast } = useToast();
 
+  const router = useRouter();
+
   const handleClearBooking = async (token, listingId, bookingData) => {
     try {
-      const response = await axios.post('/api/clear-booking', {
-        token,
-        listingId,
-        bookingData,
-      }, {
-        headers: {
-          "Content-Type": 'application/json',
+      const response = await axios.post(
+        "/api/clear-booking",
+        {
+          token,
+          listingId,
+          bookingData,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       toast({
         title: response.data.type,
         description: response.data.message,
@@ -31,8 +45,10 @@ const BookingConfirmation = ({ bookingData }) => {
     } catch (error) {
       console.log(error);
       toast({
-        title: error?.response.data?.type || 'error',
-        description: error?.response.data?.message || 'Something went wrong clearing booking',
+        title: error?.response.data?.type || "error",
+        description:
+          error?.response.data?.message ||
+          "Something went wrong clearing booking",
       });
     }
   };
@@ -66,36 +82,14 @@ const BookingConfirmation = ({ bookingData }) => {
   // Early return if bookingData is not available
   if (!bookingData) {
     return (
-      <div className="container mx-auto p-4">
-        <Card className="max-w-4xl mx-auto">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">Loading...</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">Fetching booking details...</p>
-          </CardContent>
-        </Card>
+      <div className="flex justify-center h-[80vh] items-center p-4">
+        <Loader2 className="text-center text-gray-500 w-6 h-6 animate-spin"/>
       </div>
     );
   }
 
   const { type, message, pay, data } = bookingData;
 
-  // Handle error responses
-  if (type === "error") {
-    return (
-      <div className="container mx-auto p-4">
-        <Card className="max-w-4xl mx-auto">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-red-600">Error</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">{message}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   // Handle success responses
   if (type === "success") {
@@ -131,10 +125,20 @@ const BookingConfirmation = ({ bookingData }) => {
                   )}
                 </div>
               )}
+              <div>
+              <h1 className="text-3xl text-primary ">
+                  {data.listingId.title}
+                </h1>
+              </div>
 
               {/* Property Image */}
               <div className="relative h-64 rounded-lg overflow-hidden">
-                <img src={data.listingId.coverPhoto} alt={data.listingId.title} className="w-full h-full object-cover" />
+                
+                <img
+                  src={data.listingId.coverPhoto}
+                  alt={data.listingId.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Booking Details */}
@@ -212,7 +216,9 @@ const BookingConfirmation = ({ bookingData }) => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="font-medium">Floor Area:</span>
-                    <span>{data.listingId.propertyDetails.floorArea} sq. ft.</span>
+                    <span>
+                      {data.listingId.propertyDetails.floorArea} sq. ft.
+                    </span>
                   </div>
                 </div>
               </div>
@@ -223,31 +229,48 @@ const BookingConfirmation = ({ bookingData }) => {
           {!pay && data?.position && (
             <CardContent>
               <p className="text-gray-600">
-                You are in position <strong>{data.position}</strong> in the queue.
+                You are in position <strong>{data.position}</strong> in the
+                queue.
               </p>
             </CardContent>
           )}
 
           {/* Proceed to Payment button */}
           <CardFooter className="flex justify-end">
-            {pay && !isExpired && ( // Only show the button if pay is true and timer is not expired
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                Proceed to Payment
-              </Button>
-            )}
+            {pay &&
+              !isExpired && ( // Only show the button if pay is true and timer is not expired
+                <div className="space-x-2">
+                  <Button
+                    onClick={async () => {
+                      await handleClearBooking(
+                        data.token,
+                        data.listingId._id,
+                        bookingData
+                      );
+                      router.push(`/listings/${data.listingId._id}`);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    Proceed to Payment
+                  </Button>
+                </div>
+              )}
 
             {/* Cancel and Try Again buttons when timer expires */}
             {pay && isExpired && (
               <div className="flex gap-4">
                 <Button
-                  variant="outline"
-                  onClick={() => handleClearBooking(data.token, data.listingId._id, bookingData)}
-                >
-                  Cancel
-                </Button>
-                <Button
                   className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => handleClearBooking(data.token, data.listingId._id, bookingData)}
+                  onClick={async () => {
+                    await handleClearBooking(
+                      data.token,
+                      data.listingId._id,
+                      bookingData
+                    );
+                    router.push(`/listings/${data.listingId._id}`);
+                  }}
                 >
                   Try Again
                 </Button>
@@ -259,19 +282,7 @@ const BookingConfirmation = ({ bookingData }) => {
     );
   }
 
-  // Fallback for unexpected responses
-  return (
-    <div className="container mx-auto p-4">
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Unexpected Response</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">Please try again later.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+}
+  
 
 export default BookingConfirmation;
