@@ -3,6 +3,20 @@ import connect from "@/lib/mongoDb/database";
 import PendingBooking from "@/lib/models/pendingBooking.model";
 import Listing from "@/lib/models/listing.model";
 
+// Helper function to generate an array of dates between checkIn and checkOut
+const getDateRange = (checkIn, checkOut) => {
+  const dates = [];
+  let currentDate = new Date(checkIn);
+  const endDate = new Date(checkOut);
+
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate).toISOString());
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dates;
+};
+
 export const GET = async (request) => {
   try {
     // Extract the token from the query parameters
@@ -43,46 +57,85 @@ export const GET = async (request) => {
       );
     }
 
-    // Check for overlapping dates in bookingsConfirmed
+    // Convert bookingsConfirmed and pendingBookings to ISO strings for comparison
+    const bookingsConfirmedISO = (listing.bookingsConfirmed || []).map(date =>
+      new Date(date).toISOString()
+    );
+    const pendingBookingsISO = (listing.pendingBookings || []).map(date =>
+      new Date(date).toISOString()
+    );
+
+    // Generate the user's selected date range
     const userDates = getDateRange(checkIn, checkOut);
-    const isConfirmedOverlap = userDates.some(date => (listing.bookingsConfirmed || []).includes(date));
+
+    // Check for overlapping dates in bookingsConfirmed
+    const isConfirmedOverlap = userDates.some(date =>
+      bookingsConfirmedISO.includes(date)
+    );
 
     if (isConfirmedOverlap) {
       return NextResponse.json(
-        { type: "error", message: "Selected dates are unavailable (confirmed bookings)" ,pay:false},
+        {
+          type: "error",
+          message: "Selected dates are unavailable (confirmed bookings)",
+          pay: false,
+        },
         { status: 400 }
       );
     }
 
     // Check for overlapping dates in pendingBookings
-    const isPendingOverlap = userDates.some(date => (listing.pendingBookings || []).includes(date));
+    const isPendingOverlap = userDates.some(date =>
+      pendingBookingsISO.includes(date)
+    );
 
     if (!isPendingOverlap) {
       // No overlap with pendingBookings, allow user to proceed to payment
       return NextResponse.json(
-        { type: "success", message: "You can proceed to payment",pay:true ,data: pendingBooking },
+        {
+          type: "success",
+          message: "You can proceed to payment",
+          pay: true,
+          data: pendingBooking,
+        },
         { status: 200 }
       );
     }
 
     // Overlap with pendingBookings, add user to the queue if not already in it
-    const userInQueue = listing.queue.find(entry => entry.token === token);
+    const userInQueue = listing.queue.find((entry) => entry.token === token);
     if (!userInQueue) {
-      listing.queue.push({ userId: pendingBooking.userId, token, timestamp: new Date() });
+      listing.queue.push({
+        userId: pendingBooking.userId,
+        token,
+        timestamp: new Date(),
+      });
       await listing.save();
     }
 
     // Check user's position in the queue
-    const userPosition = listing.queue.findIndex(entry => entry.token === token);
+    const userPosition = listing.queue.findIndex(
+      (entry) => entry.token === token
+    );
 
     if (userPosition === 0) {
       return NextResponse.json(
-        { type: "success", message: "You can proceed to payment",pay:true, data: pendingBooking },
+        {
+          type: "success",
+          message: "You can proceed to payment",
+          pay: true,
+          data: pendingBooking,
+        },
         { status: 200 }
       );
     } else {
       return NextResponse.json(
-        { type: "success", message: `You are in position ${userPosition + 1} in the queue`,pay:false, data: { position: userPosition + 1 } },
+        {
+          type: "success",
+          message: `You are in position ${userPosition + 1} in the queue`,
+          pay: false,
+          data: { position: userPosition + 1 },
+        },
         { status: 200 }
       );
     }
@@ -93,18 +146,4 @@ export const GET = async (request) => {
       { status: 500 }
     );
   }
-};
-
-// Helper function to generate an array of dates between checkIn and checkOut
-const getDateRange = (checkIn, checkOut) => {
-  const dates = [];
-  let currentDate = new Date(checkIn);
-  const endDate = new Date(checkOut);
-
-  while (currentDate <= endDate) {
-    dates.push(new Date(currentDate).toISOString());
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return dates;
 };

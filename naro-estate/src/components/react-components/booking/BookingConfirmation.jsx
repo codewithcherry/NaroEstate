@@ -4,10 +4,38 @@ import { Calendar, Clock, Users, MapPin, Home, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button'; // Assuming shadcn UI Button component
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'; // Assuming shadcn UI Card components
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 const BookingConfirmation = ({ bookingData }) => {
   const [timeLeft, setTimeLeft] = useState(null); // Track time left
   const [isExpired, setIsExpired] = useState(false); // Track if the timer has expired
+
+  const { toast } = useToast();
+
+  const handleClearBooking = async (token, listingId, bookingData) => {
+    try {
+      const response = await axios.post('/api/clear-booking', {
+        token,
+        listingId,
+        bookingData,
+      }, {
+        headers: {
+          "Content-Type": 'application/json',
+        },
+      });
+      toast({
+        title: response.data.type,
+        description: response.data.message,
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: error?.response.data?.type || 'error',
+        description: error?.response.data?.message || 'Something went wrong clearing booking',
+      });
+    }
+  };
 
   // Timer logic
   useEffect(() => {
@@ -206,6 +234,24 @@ const BookingConfirmation = ({ bookingData }) => {
               <Button className="bg-blue-600 hover:bg-blue-700">
                 Proceed to Payment
               </Button>
+            )}
+
+            {/* Cancel and Try Again buttons when timer expires */}
+            {pay && isExpired && (
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={() => handleClearBooking(data.token, data.listingId._id, bookingData)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => handleClearBooking(data.token, data.listingId._id, bookingData)}
+                >
+                  Try Again
+                </Button>
+              </div>
             )}
           </CardFooter>
         </Card>

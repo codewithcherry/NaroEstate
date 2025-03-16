@@ -8,20 +8,26 @@ const getDateRange = (checkIn, checkOut) => {
     const dates = [];
     let currentDate = new Date(checkIn);
     const endDate = new Date(checkOut);
-
+  
     while (currentDate <= endDate) {
-        dates.push(new Date(currentDate).toISOString().split('T')[0]); // Store dates in 'YYYY-MM-DD' format
-        currentDate.setDate(currentDate.getDate() + 1);
+      dates.push(new Date(currentDate).toISOString());
+      currentDate.setDate(currentDate.getDate() + 1);
     }
-
+  
     return dates;
-};
+  };
 
 // Helper function to clear bookings
 const clearBookings = async (listing, token, datesToClear) => {
+    console.log(listing);
+    console.log('datesToClear', datesToClear);
+
+    // Convert pendingBookings dates to ISO strings for comparison
+    const pendingBookingsISO = listing.pendingBookings.map(date => date.toISOString());
+
     // Remove the dates from the listing's pendingBookings array
     listing.pendingBookings = listing.pendingBookings.filter(
-        date => !datesToClear.includes(date)
+        date => !datesToClear.includes(date.toISOString())
     );
 
     // Add the dates to the listing's bookingsCancelled array
@@ -31,6 +37,10 @@ const clearBookings = async (listing, token, datesToClear) => {
     listing.queue = listing.queue.filter(
         queueItem => queueItem.token !== token
     );
+
+    console.log("pendingBookings: ", listing.pendingBookings);
+    console.log("bookingsCancelled: ", listing.bookingsCancelled);
+    console.log("queue: ", listing.queue);
 
     // Save the updated listing
     await listing.save();
@@ -43,6 +53,8 @@ export const POST = async (request) => {
         const reqbody = await request.json();
         const { token, listingId, bookingData } = reqbody; // Extract token, listingId, and bookingData from the request body
         const userId = request.headers.get('userId');
+
+        console.log(bookingData);
 
         await connect();
 
@@ -79,7 +91,9 @@ export const POST = async (request) => {
         }
 
         // Generate an array of dates to clear from the listing's pendingBookings array
-        const datesToClear = getDateRange(bookingData.checkIn, bookingData.checkOut);
+        const datesToClear = getDateRange(bookingData.data.checkIn, bookingData.data.checkOut);
+
+        console.log(datesToClear);
 
         // Check if the listing exists
         const listing = await Listing.findById(listingId);
