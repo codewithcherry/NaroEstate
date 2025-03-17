@@ -25,6 +25,7 @@ const privatePaths = [
   "/api/upload/property-media",
   "/api/user/create-listing",
   "/api/user/get-booking",
+  "/api/user/my-booking-history",
   "/api/rent-enquiry",
   "/api/sale-enquiry",
   "/api/reserve",
