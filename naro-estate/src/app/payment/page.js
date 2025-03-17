@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from "next/compat/router";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from 'next/navigation'; // Updated import
+import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import BookingDetails from '@/components/react-components/booking/BookingDetails';
@@ -50,7 +50,7 @@ const PaymentPage = () => {
         setMessage('Invalid token.');
       }
     }
-  }, [router, searchParams]);
+  }, [searchParams]); // Removed router from dependencies
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
