@@ -84,6 +84,21 @@ const userSchema = new Schema({
     default: 0,
     min: 0
   },
+  // Field to store an array of Booking IDs
+  myBookingHistory: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking", // Reference to the Booking model
+      default:[]
+    },
+  ],
+  myGuestBookingHistory:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking", // Reference to the Booking model
+      default:[]
+    },
+  ],
   isVerified: {
     type: Boolean,
     default: false

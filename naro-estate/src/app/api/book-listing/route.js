@@ -5,6 +5,7 @@ import PendingBooking from "@/lib/models/pendingBooking.model";
 import Booking from "@/lib/models/booking.model";
 import User from "@/lib/models/user.model";
 import mongoose from "mongoose";
+import createNotification from "@/lib/services/notification";
 
 /**
  * Helper function to generate an array of dates between checkIn and checkOut.
@@ -70,7 +71,9 @@ const clearBookings = async (listing, token, datesToClear) => {
     );
 
     // Convert filtered pendingBookings back to Date objects
-    listing.pendingBookings = listing.pendingBookings.map((date) => new Date(date));
+    listing.pendingBookings = listing.pendingBookings.map(
+      (date) => new Date(date)
+    );
 
     // Remove the user from the queue if their token matches
     listing.queue = listing.queue.filter(
@@ -91,6 +94,20 @@ const clearBookings = async (listing, token, datesToClear) => {
   }
 };
 
+// helper function to create and send the notification
+
+const sendNotification = async (id, title, type, message) => {
+  return await createNotification({
+    title: title,
+    message: message,
+    type: type,
+    sender: {
+      name: "Team NaroEstate",
+      avatar: "https://i.pravatar.cc/40?img=1",
+    },
+    recipient: id, // Replace with actual user ID
+  });
+};
 
 /**
  * POST route to handle booking creation.
@@ -188,11 +205,139 @@ export const POST = async (request) => {
       stayPricePerDay,
       totalPrice,
       totalDays,
-      guests,
+      guests,payment: {
+        status: "SUCCESS",
+        paymentType: "prepaid",
+        transactionId: "TXN123456789",
+      }
     });
-    
+
     // Save the new booking using the session
     const bookingDetails = await newBooking.save({ session });
+
+    // update the user myBookingHistory
+    const updatedUserBookingHistory = await User.findByIdAndUpdate(
+      userId,
+      { $push: { myBookingHistory: bookingDetails._id } },
+      { new: true, session } // Use the session
+    ).catch((error) => {
+      console.error("Error updating user booking History:", error);
+      throw new Error("Failed to update listing.");
+    });
+
+    if (!updatedUserBookingHistory) {
+      await session.abortTransaction(); // Abort the transaction
+      session.endSession(); // End the session
+      return NextResponse.json(
+        {
+          type: "error",
+          message: "Failed to update user myBookingHistory.",
+        },
+        {
+          status: 500, // Hardcoded status code
+        }
+      );
+    }
+
+    const GuestMessage = `Hello ${updatedUserBookingHistory.username},  
+
+                          Your booking for  **${listing.title}** is confirmed.  
+
+                          📌 **Booking ID:** ${bookingDetails._id}  
+
+                          For more details, please check your  booking history in your profile.  
+
+                          Thank you for being a valued coustmer!  
+
+                          **Best regards,**  
+                          Team NaroEstate`;
+
+await sendNotification(userId,'Booking confirmed!','message',GuestMessage);
+
+
+    // update the host booking history
+    // Fetch the listing document to get the host ID
+    const hostListing = await Listing.findById(listingId).session(session); // Use the session
+
+    // Check if the listing exists
+    if (!hostListing) {
+      await session.abortTransaction(); // Abort the transaction
+      session.endSession(); // End the session
+      return NextResponse.json(
+        {
+          type: "error",
+          message: "Listing not found.",
+        },
+        {
+          status: 404, // Hardcoded status code
+        }
+      );
+    }
+
+    const hostId = hostListing.createdBy;
+
+    // Validate hostId (ensure it's a valid ObjectId)
+    if (!mongoose.Types.ObjectId.isValid(hostId)) {
+      await session.abortTransaction(); // Abort the transaction
+      session.endSession(); // End the session
+      return NextResponse.json(
+        {
+          type: "error",
+          message: "Invalid host ID.",
+        },
+        {
+          status: 400, // Hardcoded status code
+        }
+      );
+    }
+
+    // Update the host's myGuestBookingHistory and increment bookings/guests in a single operation
+    const updatedHost = await User.findByIdAndUpdate(
+      hostId,
+      {
+        $push: { myGuestBookingHistory: bookingDetails._id }, // Add booking to guest history
+        $inc: {
+          bookings: 1, // Increment bookings by 1
+          guests: guests, // Increment guests by the number of guests from the request
+        },
+      },
+      { new: true, session } // Use the same session for consistency
+    ).catch(async (error) => {
+      console.error("Error updating host:", error);
+      await session.abortTransaction(); // Explicitly abort the transaction
+      session.endSession(); // End the session
+      throw new Error("Failed to update host.");
+    });
+
+    // Check if the host update was successful
+    if (!updatedHost) {
+      await session.abortTransaction(); // Abort the transaction
+      session.endSession(); // End the session
+      return NextResponse.json(
+        {
+          type: "error",
+          message: "Failed to update host.",
+        },
+        {
+          status: 500, // Hardcoded status code
+        }
+      );
+    }
+
+    const hostMessage = `Hello ${updatedHost.username},  
+
+                                  You have received a new booking for **${listing.title}**.  
+
+                                  📌 **Booking ID:** ${bookingDetails._id}  
+
+                                  For more details, please check your guest booking history in your profile.  
+
+                                  Thank you for being a valued host!  
+
+                                  **Best regards,**  
+                                  Team NaroEstate`;
+
+    await sendNotification(hostId, "You have New Booking", "payment", hostMessage);
 
     // Generate the array of dates between checkIn and checkOut
     const dateRange = generateDateRange(checkIn, checkOut);
@@ -222,7 +367,9 @@ export const POST = async (request) => {
     }
 
     // Find and delete the pending booking using the token
-    const pendingBook = await PendingBooking.findOneAndDelete({ token }).session(session); // Use the session
+    const pendingBook = await PendingBooking.findOneAndDelete({
+      token,
+    }).session(session); // Use the session
 
     if (!pendingBook) {
       await session.abortTransaction(); // Abort the transaction
@@ -240,18 +387,6 @@ export const POST = async (request) => {
 
     // Clear pendingBookings, clear token, clear queue
     await clearBookings(listing, token, dateRange);
-
-    // Increment the user's bookings and guests count
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $inc: {
-          bookings: 1, // Increment bookings by 1
-          guests: guests, // Increment guests by the number of guests from the request
-        },
-      },
-      { session } // Use the same session for consistency
-    );
 
     // Commit the transaction if everything succeeds
     await session.commitTransaction();
