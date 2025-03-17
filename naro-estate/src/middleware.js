@@ -28,6 +28,7 @@ const privatePaths = [
   "/api/sale-enquiry",
   "/api/reserve",
   "/api/clear-booking",
+  '/api/book-listing',
   "/api/user/mylistings",
   "/api/user/update-listing",
   "/api/user/notifications",

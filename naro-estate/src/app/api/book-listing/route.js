@@ -53,20 +53,33 @@ const generateDateRange = (checkIn, checkOut) => {
  */
 const clearBookings = async (listing, token, datesToClear) => {
   try {
-    // Convert pendingBookings dates to ISO strings for comparison
+    console.log("Before update:");
+    console.log("Pending Bookings:", listing.pendingBookings);
+    console.log("Queue:", listing.queue);
+    console.log("Dates to Clear:", datesToClear);
+
+    // Convert both pendingBookings and datesToClear to ISO strings for proper comparison
     const pendingBookingsISO = listing.pendingBookings.map((date) =>
       date.toISOString()
     );
+    const datesToClearISO = datesToClear.map((date) => date.toISOString());
 
     // Remove the dates from the listing's pendingBookings array
-    listing.pendingBookings = listing.pendingBookings.filter(
-      (date) => !datesToClear.includes(date.toISOString())
+    listing.pendingBookings = pendingBookingsISO.filter(
+      (date) => !datesToClearISO.includes(date)
     );
+
+    // Convert filtered pendingBookings back to Date objects
+    listing.pendingBookings = listing.pendingBookings.map((date) => new Date(date));
 
     // Remove the user from the queue if their token matches
     listing.queue = listing.queue.filter(
       (queueItem) => queueItem.token !== token
     );
+
+    console.log("After update:");
+    console.log("Pending Bookings:", listing.pendingBookings);
+    console.log("Queue:", listing.queue);
 
     // Save the updated listing
     await listing.save();
@@ -77,6 +90,7 @@ const clearBookings = async (listing, token, datesToClear) => {
     throw new Error("Failed to clear bookings and update listing.");
   }
 };
+
 
 /**
  * POST route to handle booking creation.
@@ -165,23 +179,20 @@ export const POST = async (request) => {
       );
     }
 
-    // Create new booking
-    const newBooking = await Booking.create(
-      [
-        {
-          userId,
-          listingId,
-          checkIn, // Use checkIn directly
-          checkOut, // Use checkOut directly
-          token,
-          stayPricePerDay,
-          totalPrice,
-          totalDays,
-          guests,
-        },
-      ],
-      { session } // Use the session
-    );
+    const newBooking = new Booking({
+      userId,
+      listingId,
+      checkIn, // Use checkIn directly
+      checkOut, // Use checkOut directly
+      token,
+      stayPricePerDay,
+      totalPrice,
+      totalDays,
+      guests,
+    });
+    
+    // Save the new booking using the session
+    const bookingDetails = await newBooking.save({ session });
 
     // Generate the array of dates between checkIn and checkOut
     const dateRange = generateDateRange(checkIn, checkOut);
@@ -250,7 +261,7 @@ export const POST = async (request) => {
       {
         type: "success",
         message: "Successfully completed and booked the listing",
-        bookingDetails: newBooking,
+        bookingDetails: bookingDetails,
       },
       {
         status: 200, // Hardcoded status code

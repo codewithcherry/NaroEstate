@@ -19,6 +19,8 @@ const BookingConfirmation = ({ bookingData }) => {
   const [timeLeft, setTimeLeft] = useState(null); // Track time left
   const [isExpired, setIsExpired] = useState(false); // Track if the timer has expired
 
+  const [isPaymentLoading,setIsPaymentLoading]=useState(false)
+
   const { toast } = useToast();
 
   const router = useRouter();
@@ -52,6 +54,40 @@ const BookingConfirmation = ({ bookingData }) => {
       });
     }
   };
+
+  const handleProceedPayment=async () => {
+    try {
+      setIsPaymentLoading(true);
+
+      const body={
+        listingId:bookingData.data.listingId._id,
+        bookingData:bookingData.data
+      }
+
+      const response=await axios.post('/api/book-listing',body,
+        {
+          headers:{
+            "Content-Type":'application/json'
+          }
+        }
+      )
+
+      console.log(response.data);
+
+      toast({
+        title:response.data.type,
+        description:response.data.message
+      })
+
+      router.push(`/payment-status?id=${response.data.bookingDetails._id}`);
+      
+    } catch (error) {
+      console.log(error)
+    }
+    finally{
+      setIsPaymentLoading(false)
+    }
+  }
 
   // Timer logic
   useEffect(() => {
@@ -252,8 +288,12 @@ const BookingConfirmation = ({ bookingData }) => {
                   >
                     Cancel
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    Proceed to Payment
+                  <Button 
+                  onClick={()=>{
+                    handleProceedPayment()
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700">
+                    {isPaymentLoading?<Loader2 className="w-4 h-4 text-gray-500 animate-spin"/>:"Proceed to Payment"}
                   </Button>
                 </div>
               )}
