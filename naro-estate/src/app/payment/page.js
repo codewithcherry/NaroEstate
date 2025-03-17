@@ -40,13 +40,15 @@ const PaymentPage = () => {
   };
 
   useEffect(() => {
-    const bookingId = searchParams.get('id');
+    if (typeof window !== 'undefined') {
+      const bookingId = searchParams.get('id');
 
-    if (bookingId) {
-      setBookingId(bookingId);
-      fetchBooking(bookingId); // Fetch booking details when token is available
-    } else {
-      setMessage('Invalid token.');
+      if (bookingId) {
+        setBookingId(bookingId);
+        fetchBooking(bookingId); // Fetch booking details when token is available
+      } else {
+        setMessage('Invalid token.');
+      }
     }
   }, [router, searchParams]);
 

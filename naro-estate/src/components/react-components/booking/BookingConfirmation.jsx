@@ -79,7 +79,7 @@ const BookingConfirmation = ({ bookingData }) => {
         description:response.data.message
       })
 
-      router.push(`/payment-status?id=${response.data.bookingDetails._id}`);
+      router.push(`/payment?id=${response.data.bookingDetails._id}`);
       
     } catch (error) {
       console.log(error)

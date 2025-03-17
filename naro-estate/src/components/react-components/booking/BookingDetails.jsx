@@ -121,8 +121,8 @@ const BookingDetails = ({ data }) => {
         </div>
       </CardContent>
 
-      <CardFooter className="mt-4 text-center text-sm text-gray-500">
-        <p>
+      <CardFooter className="mt-4 text-center text-sm w-full text-gray-500">
+        <p className='text-center'>
           Reachout to care@naroestate.com for any enquiry
         </p>
       </CardFooter>
