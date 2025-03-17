@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from "next/compat/router";
 import { useSearchParams } from "next/navigation";
 import axios from 'axios';
@@ -82,7 +82,13 @@ const PaymentPage = () => {
 };
 
 const Page = () => {
-  return <PaymentPage />;
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-64">
+        <Loader2 className='w-6 h-6 text-gray-500 animate-spin' />
+      </div>}>
+        <PaymentPage />
+    </Suspense>
+  );
 };
 
 export default Page;
