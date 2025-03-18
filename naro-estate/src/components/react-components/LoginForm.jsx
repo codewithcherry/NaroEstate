@@ -76,7 +76,7 @@ const LoginForm = ({ className, ...props }) => {
         <CardContent>
           <form onSubmit={handleLogin}>
             <div className="grid gap-6">
-              <div className="flex flex-col gap-4">
+              {/* <div className="flex flex-col gap-4">
                 <Button variant="outline" className="w-full" aria-label="Login with Apple">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -100,7 +100,7 @@ const LoginForm = ({ className, ...props }) => {
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
                   Or continue with
                 </span>
-              </div>
+              </div> */}
               <div className="grid gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>

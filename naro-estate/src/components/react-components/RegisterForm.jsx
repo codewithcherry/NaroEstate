@@ -87,7 +87,7 @@ const RegisterForm = ({ className, ...props }) => {
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Creating Account...' : 'Create an Account'}
               </Button>
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+              {/* <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
                   Or register using
                 </span>
@@ -111,7 +111,7 @@ const RegisterForm = ({ className, ...props }) => {
                   </svg>
                   <span className="sr-only">Register with Google</span>
                 </Button>
-              </div>
+              </div> */}
               <div className="text-center text-sm">
                 Already have an account?{' '}
                 <Link href="/login" className="underline underline-offset-4">

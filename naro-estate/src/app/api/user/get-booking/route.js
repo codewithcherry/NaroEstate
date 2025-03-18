@@ -61,17 +61,17 @@ export const GET = async (request) => {
     }
 
     // Check if the userId matches the booking's userId
-    if (userId.toString() !== booking.userId.toString()) {
-      return NextResponse.json(
-        {
-          type: 'error',
-          message: 'Unauthorized access to booking details!',
-        },
-        {
-          status: 403, // 403 Forbidden status
-        }
-      );
-    }
+    // if (userId.toString() !== booking.userId.toString()) {
+    //   return NextResponse.json(
+    //     {
+    //       type: 'error',
+    //       message: 'Unauthorized access to booking details!',
+    //     },
+    //     {
+    //       status: 403, // 403 Forbidden status
+    //     }
+    //   );
+    // }
 
     // Return the booking details if everything is valid
     return NextResponse.json({
