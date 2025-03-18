@@ -26,12 +26,12 @@ const NAV_LINKS = [
 ];
 
 const LOGGED_IN_LINKS = [
+  {path: '/notifications', label: 'Notifications', icon: <BellIcon className="w-4 h-4 mr-2" />},
   { path: '/my-listings', label: 'My Listings', icon: <House className="w-4 h-4 mr-2" /> },
   { path: '/profile', label: 'Profile', icon: <User className="w-4 h-4 mr-2" /> },
   {path: '/my-bookings',label:'My Bookings', icon: <CalendarDays className='w-4 h-4 mr-2' />},
   {path: '/my-guests', label: "My Guests",icon : <Users className='w-4 h-4 mr-2'/>},
   { path: '/settings', label: 'Settings', icon: <Settings className="w-4 h-4 mr-2" /> },
-  {path: '/notifications', label: 'Notifications', icon: <BellIcon className="w-4 h-4 mr-2" />}
 ];
 
 const Navbar = () => {
@@ -154,7 +154,10 @@ const Navbar = () => {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {LOGGED_IN_LINKS.map((link) => (
-                    <DropdownMenuItem key={link.path} onClick={() => router.push(link.path)}>
+                    <DropdownMenuItem key={link.path} onClick={() =>{ 
+                      setIsMobileMenuOpen(false)
+                      router.push(link.path)
+                      }}>
                       {link.icon}
                       {link.label}
                     </DropdownMenuItem>
