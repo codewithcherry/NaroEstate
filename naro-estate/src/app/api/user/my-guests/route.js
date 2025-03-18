@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import connect from "@/lib/mongoDb/database";
 import User from "@/lib/models/user.model";
+import Booking from "@/lib/models/booking.model";
+import Listing from "@/lib/models/listing.model";
 
 export const GET = async (request) => {
     try {
